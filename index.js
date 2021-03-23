@@ -3,6 +3,7 @@ const client = new Discord.Client();
 const axios = require('axios')
 var mysql = require('mysql');
 var image = require('./commands/image.js')
+var moderation = require('./commands/moderation.js')
 const { prefix, token, mysql_user, mysql_passwd, mysql_db } = require('./config.json');
 
 var connection = mysql.createConnection({
@@ -10,7 +11,8 @@ var connection = mysql.createConnection({
     user     : mysql_user,
     password : mysql_passwd,
     database : mysql_db
-}).connect(function(err) {
+})
+    connection.connect(function(err) {
     if (err) {
         console.error('error connecting: ' + err.stack);
         return;
@@ -28,7 +30,7 @@ client.on('message', async msg => {
     if (msg.content.startsWith('k!help')) {
         const embed = new Discord.MessageEmbed()
             .setTitle("Help")
-            .setDescription("Hey there, I'm Kitsune and I'm here to pamper you!")
+            .setDescription("Hey there, I'm KitsuneTheBot and I'm here to pamper you!")
             .addFields(
                 {
                     name: "Image Commands",
@@ -45,7 +47,7 @@ client.on('message', async msg => {
                     value: "**k!help** - Show help\n",
                 }
             )
-            .setFooter(`Kitsune v0.0.1`)
+            .setFooter(`KitsuneTheBot v0.0.1`)
             .setColor("#ff9d5a");
         msg.channel.send(embed);
     }
@@ -72,6 +74,14 @@ client.on('message', async msg => {
 
     if (msg.content.startsWith('k!tickle')) {
         image.commands['tickle'](msg)
+    }
+
+    if (msg.content.startsWith('k!ban')) {
+        moderation.commands['ban'](msg)
+    }
+
+    if (msg.content.startsWith('k!kick')) {
+        moderation.commands['kick'](msg)
     }
 });
 client.login(token);
