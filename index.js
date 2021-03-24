@@ -20,8 +20,24 @@ connection.connect(function(err) {
     console.log('connected as id ' + connection.threadId);
 });
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
+    const date = new Date();
+    let dateNow = Date.now()/1000 | 0;
+    connection.query("SELECT * FROM `mute` WHERE `unmute_time` >= ?", [dateNow], async function (err, isAnyoneMuted, f) {
+        if (isAnyoneMuted.length != 0){
+            for (i = 0; i < isAnyoneMuted.length; i++){
+                let raw_timeout = isAnyoneMuted[0].unmute_time * 1000
+                let time_timeout = raw_timeout - (dateNow*1000)
+                let guildCheck = client.guilds.cache.get(isAnyoneMuted[i].server_id);
+                let mutedUser = await guildCheck.members.fetch(isAnyoneMuted[i].userid);
+                let role = guildCheck.roles.cache.find(r => r.name === "Muted");
+                setTimeout(() => {
+                    mutedUser.roles.remove(role).catch(console.error);
+                }, time_timeout);
+            }
+        }
+    })
 });
 
 client.on('message', async msg => {
@@ -89,20 +105,8 @@ client.on('message', async msg => {
     }
 });
 
-/*
-const date = new Date();
-let dateNow = Date.now()/1000 | 0;
-connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` <= ?", [mention.id, serverId, dateNow], async function (err, isAnyoneMuted, f) {
-    if (isAnyoneMuted.length != 0){
-        for (i = 0; i < isAnyoneMuted.length; i++){
-            let time_timeout = unmute_time * 1000
-            setTimeout(() => {
-                let mutedUser = msg.guild.members.resolve(mention.id);
-                mutedUser.roles.remove(role).catch(console.error);
-            }, time_timeout);
-        }
-    }
-})*/
+
+
 
 
 
