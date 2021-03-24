@@ -110,9 +110,10 @@ var commands = {
                     } else {
                         muteReason = paramsSplit[1]
                     }
+
                     let muteTime = parseInt(paramsSplit[0])
                     if (Number.isInteger(muteTime) && muteTime <= 48){
-                        
+
                         let unmute_time = 3600 * muteTime
                         let unmute_timestamp = dateNow + unmute_time
 
@@ -121,11 +122,12 @@ var commands = {
                             let role = msg.guild.roles.cache.find(r => r.name === "Muted");
                             mutedUser.roles.add(role).catch(console.error);
 
-                            const image = `https://media1.tenor.com/images/2dfc019556073683716852b293959706/tenor.gif?itemid=17040749`
+                            const image = `https://media1.tenor.com/images/c6571c335cd8e56de03ae05f81790efa/tenor.gif?itemid=20294899`
                             let title = `Get muted, ${mention.username}#${mention.discriminator}!`
                             let subtitle = `${msg.author.username} mutes ${mention.username}`
                             let embedCreation = await embedGenerator(title, image, subtitle)
-                            return msg.channel.send(embedCreation);
+                            msg.channel.send(embedCreation);
+                            timeout(msg, mutedUser, role, unmute_time)
 
                         })
 
@@ -149,4 +151,12 @@ function embedGenerator(title, image, subtitle){
         .setAuthor(subtitle);
     return embed;
 }
+
+function timeout(msg, mutedUser, role, unmute_time) {
+    let time_timeout = unmute_time * 1000
+    setTimeout(() => {
+        mutedUser.roles.remove(role).catch(console.error);
+    }, time_timeout);
+}
+
 module.exports.commands = commands;

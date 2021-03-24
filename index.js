@@ -88,4 +88,22 @@ client.on('message', async msg => {
         moderation.commands['tempmute'](msg)
     }
 });
+
+/*
+const date = new Date();
+let dateNow = Date.now()/1000 | 0;
+connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` <= ?", [mention.id, serverId, dateNow], async function (err, isAnyoneMuted, f) {
+    if (isAnyoneMuted.length != 0){
+        for (i = 0; i < isAnyoneMuted.length; i++){
+            let time_timeout = unmute_time * 1000
+            setTimeout(() => {
+                let mutedUser = msg.guild.members.resolve(mention.id);
+                mutedUser.roles.remove(role).catch(console.error);
+            }, time_timeout);
+        }
+    }
+})*/
+
+
+
 client.login(token);
