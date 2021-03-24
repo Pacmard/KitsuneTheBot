@@ -122,7 +122,7 @@ var commands = {
                             let role = msg.guild.roles.cache.find(r => r.name === "Muted");
                             mutedUser.roles.add(role).catch(console.error);
 
-                            const image = `https://media1.tenor.com/images/c6571c335cd8e56de03ae05f81790efa/tenor.gif?itemid=20294899`
+                            const image = `https://i.imgur.com/0IxjsfM.gif`
                             let title = `Get muted, ${mention.username}#${mention.discriminator}!`
                             let subtitle = `${msg.author.username} mutes ${mention.username}`
                             let embedCreation = await embedGenerator(title, image, subtitle)
@@ -132,8 +132,8 @@ var commands = {
                         })
 
                     } else if (Number.isInteger(muteTime) == false) {
-                        msg.channel.send('heh')
-                    } else msg.channel.send('pognt')
+                        msg.reply('Please indicate the time for mute (in hours!) Exapmle: k!tempmute @KitsuneTheBot 1 Reason')
+                    } else msg.channel.send('Mute time cannot be more than 48 hours!')
                 }
             })
         } else {
