@@ -103,11 +103,69 @@ client.on('message', async msg => {
     if (msg.content.startsWith('k!tempmute')) {
         moderation.commands['tempmute'](msg)
     }
+
+    if (msg.content.startsWith('k!unmute')) {
+        moderation.commands['unmute'](msg)
+    }
+    if (msg.content.startsWith('k!test')){
+        let channelsArr = msg.guild.channels.cache.array()
+        let role = msg.guild.roles.cache.find(r => r.name === "Muted");
+        for (i = 0; i < channelsArr.length; i++){
+            if (channelsArr[i].type == 'text'){
+                let channel = msg.guild.channels.cache.get(channelsArr[i].id)
+                channel.overwritePermissions([
+                    {
+                        id: role,
+                        deny: ['SEND_MESSAGES'],
+                    }
+                ]);
+            } else if (channelsArr[i].type == 'voice'){
+                let channel = msg.guild.channels.cache.get(channelsArr[i].id)
+                channel.overwritePermissions([
+                    {
+                        id: role,
+                        deny: ['CONNECT'],
+                    }
+                ]);
+            }
+        }
+
+    }
 });
 
+client.on("guildCreate", async function(guild){
+    let role
+    await guild.roles.create({
+        data: {
+            name: 'Muted',
+            color: 'DEFAULT'
+        },
+        reason: 'Role for k!tempmute command',
+    }).then(async function (res){
+        role = await guild.roles.cache.get(res.id);
+        role.setPermissions(0);
+    })
 
-
-
-
+    let channelsArr = guild.channels.cache.array()
+    for (i = 0; i < channelsArr.length; i++){
+        if (channelsArr[i].type == 'text'){
+            let channel = guild.channels.cache.get(channelsArr[i].id)
+            channel.overwritePermissions([
+                {
+                    id: role,
+                    deny: ['SEND_MESSAGES'],
+                }
+            ]);
+        } else if (channelsArr[i].type == 'voice'){
+            let channel = guild.channels.cache.get(channelsArr[i].id)
+            channel.overwritePermissions([
+                {
+                    id: role,
+                    deny: ['CONNECT'],
+                }
+            ]);
+        }
+    }
+});
 
 client.login(token);

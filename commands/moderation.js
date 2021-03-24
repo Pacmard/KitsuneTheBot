@@ -86,11 +86,11 @@ var commands = {
         }
 
         if (mention.id === msg.author.id) {
-            return msg.reply("You can't ban yourself!");
+            return msg.reply("You can't mute yourself!");
         }
 
         let perms = msg.channel.permissionsFor(msg.member);
-        if (perms.has('MANAGE_MESSAGES')) {
+        if (perms.has('MANAGE_MESSAGES') || perms.has('KICK_MEMBERS') || perms.has('BAN_MEMBERS') || perms.has('MANAGE_ROLES')) {
 
             let mutedUser = msg.guild.members.resolve(mention.id);
             let serverId = msg.guild.id;
@@ -138,6 +138,42 @@ var commands = {
             })
         } else {
             msg.reply(`You don't have permissions to mute people!`)
+        }
+    },
+    unmute: async function (msg){
+        const mention = msg.mentions.users.first();
+        if (!mention) {
+            return msg.reply("Please, specify the user!");
+        }
+
+        if (mention.id === msg.author.id) {
+            return msg.reply("You can't mute yourself!");
+        }
+        let perms = msg.channel.permissionsFor(msg.member);
+        if (perms.has('MANAGE_MESSAGES') || perms.has('KICK_MEMBERS') || perms.has('BAN_MEMBERS') || perms.has('MANAGE_ROLES')) {
+            let serverId = msg.guild.id;
+            const date = new Date();
+            let dateNow = Date.now()/1000 | 0;
+            connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` >= ?", [mention.id, serverId, dateNow], async function (err, isMuted, f) {
+                if (isMuted.length == 1){
+                    let mutedUser = msg.guild.members.resolve(mention.id);
+
+                   await connection.query("UPDATE `mute` SET `unmute_time` = ? WHERE `mute`.`id` = ?;", [dateNow.toString(), isMuted[0].id], async function (err, isMuted, f) {
+
+                        let role = msg.guild.roles.cache.find(r => r.name === "Muted");
+                        mutedUser.roles.remove(role).catch(console.error);
+                        // UPDATE `mute` SET `unmute_time` = '1616591021' WHERE `mute`.`id` = 23;
+                    })
+
+                    const image = `https://media.tenor.com/images/7f9d13686d8d6b73d669c618ccb0afac/tenor.gif`
+                    let title = `Yay, ${mention.username}#${mention.discriminator} got unmuted!`
+                    let subtitle = `${msg.author.username} unmutes ${mention.username}`
+                    let embedCreation = await embedGenerator(title, image, subtitle)
+                    msg.channel.send(embedCreation);
+                } else {
+                    msg.reply('This user is not muted!')
+                }
+            })
         }
     }
 }
