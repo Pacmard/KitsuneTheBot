@@ -1,5 +1,22 @@
 const axios = require('axios');
 const Discord = require('discord.js');
+var mysql = require('mysql');
+const { prefix, token, mysql_user, mysql_passwd, mysql_db } = require('../config.json');
+
+var connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : mysql_user,
+    password : mysql_passwd,
+    database : mysql_db
+})
+connection.connect(function(err) {
+    if (err) {
+        console.error('error connecting: ' + err.stack);
+        return;
+    }
+    console.log('connected as id ' + connection.threadId);
+});
+
 var commands = {
     ban: async function (msg) {
         const mention = msg.mentions.users.first();
@@ -11,7 +28,9 @@ var commands = {
             return msg.reply("You can't ban yourself!");
         }
 
-        if (msg.member.guild.me.hasPermission(['BAN_MEMBERS']) || msg.member.guild.me.hasPermission(['ADMINISTRATOR'])) {
+        let perms = msg.channel.permissionsFor(msg.member);
+
+        if (perms.has('BAN_MEMBERS')) {
 
             removingCmdsVars = msg.content.replace(`k!ban`, ``).replace(/<@!?\d+>/, ``)
             params = removingCmdsVars.trimStart().replace(/ +(?= )/g, '');
@@ -45,8 +64,9 @@ var commands = {
         if (mention.id === msg.author.id) {
             return msg.reply("You can't ban yourself!");
         }
+        let perms = msg.channel.permissionsFor(msg.member);
 
-        if (msg.member.guild.me.hasPermission(['KICK_MEMBERS']) || msg.member.guild.me.hasPermission(['ADMINISTRATOR'])) {
+        if (perms.has('KICK_MEMBERS')) {
             let kickedUser = msg.guild.members.resolve(mention.id)
             kickedUser.kick()
 
@@ -57,6 +77,65 @@ var commands = {
             return msg.channel.send(embedCreation);
         } else {
             msg.reply(`You don't have permissions to ban people!`)
+        }
+    },
+    tempmute: async function (msg){
+        const mention = msg.mentions.users.first();
+        if (!mention) {
+            return msg.reply("Please, specify the user!");
+        }
+
+        if (mention.id === msg.author.id) {
+            return msg.reply("You can't ban yourself!");
+        }
+
+        let perms = msg.channel.permissionsFor(msg.member);
+        if (perms.has('MANAGE_MESSAGES')) {
+
+            let mutedUser = msg.guild.members.resolve(mention.id);
+            let serverId = msg.guild.id;
+            const date = new Date();
+            let dateNow = Date.now()/1000 | 0;
+            connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` >= ?", [mention.id, serverId, dateNow], async function (err, isMuted, f) {
+                if (isMuted.length == 0){
+
+                    removingCmdsVars = msg.content.replace(`k!tempmute`, ``).replace(`<@!${mention.id}>`, ``).replace(`<@${mention.id}>`, ``);
+                    params = removingCmdsVars.trimStart().replace(/ +(?= )/g, '');
+                    paramsSplit = params.split(' ');
+
+                    let muteReason;
+
+                    if (paramsSplit.length == 1) {
+                        muteReason = 'Not provided'
+                    } else {
+                        muteReason = paramsSplit[1]
+                    }
+                    let muteTime = parseInt(paramsSplit[0])
+                    if (Number.isInteger(muteTime) && muteTime <= 48){
+                        
+                        let unmute_time = 3600 * muteTime
+                        let unmute_timestamp = dateNow + unmute_time
+
+                        connection.query("INSERT INTO `mute` (`userid`, `server_id`, `unmute_time`, `reason`) VALUES (?, ?, ?, ?);", [mention.id, serverId, unmute_timestamp, muteReason], async function (error, result, fields) {
+
+                            let role = msg.guild.roles.cache.find(r => r.name === "Muted");
+                            mutedUser.roles.add(role).catch(console.error);
+
+                            const image = `https://media1.tenor.com/images/2dfc019556073683716852b293959706/tenor.gif?itemid=17040749`
+                            let title = `Get muted, ${mention.username}#${mention.discriminator}!`
+                            let subtitle = `${msg.author.username} mutes ${mention.username}`
+                            let embedCreation = await embedGenerator(title, image, subtitle)
+                            return msg.channel.send(embedCreation);
+
+                        })
+
+                    } else if (Number.isInteger(muteTime) == false) {
+                        msg.channel.send('heh')
+                    } else msg.channel.send('pognt')
+                }
+            })
+        } else {
+            msg.reply(`You don't have permissions to mute people!`)
         }
     }
 }

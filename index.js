@@ -12,7 +12,7 @@ var connection = mysql.createConnection({
     password : mysql_passwd,
     database : mysql_db
 })
-    connection.connect(function(err) {
+connection.connect(function(err) {
     if (err) {
         console.error('error connecting: ' + err.stack);
         return;
@@ -82,6 +82,10 @@ client.on('message', async msg => {
 
     if (msg.content.startsWith('k!kick')) {
         moderation.commands['kick'](msg)
+    }
+
+    if (msg.content.startsWith('k!tempmute')) {
+        moderation.commands['tempmute'](msg)
     }
 });
 client.login(token);
