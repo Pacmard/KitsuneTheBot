@@ -107,30 +107,6 @@ client.on('message', async msg => {
     if (msg.content.startsWith('k!unmute')) {
         moderation.commands['unmute'](msg)
     }
-    if (msg.content.startsWith('k!test')){
-        let channelsArr = msg.guild.channels.cache.array()
-        let role = msg.guild.roles.cache.find(r => r.name === "Muted");
-        for (i = 0; i < channelsArr.length; i++){
-            if (channelsArr[i].type == 'text'){
-                let channel = msg.guild.channels.cache.get(channelsArr[i].id)
-                channel.overwritePermissions([
-                    {
-                        id: role,
-                        deny: ['SEND_MESSAGES'],
-                    }
-                ]);
-            } else if (channelsArr[i].type == 'voice'){
-                let channel = msg.guild.channels.cache.get(channelsArr[i].id)
-                channel.overwritePermissions([
-                    {
-                        id: role,
-                        deny: ['CONNECT'],
-                    }
-                ]);
-            }
-        }
-
-    }
 });
 
 client.on("guildCreate", async function(guild){
