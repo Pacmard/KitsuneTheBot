@@ -111,6 +111,14 @@ client.on('message', async msg => {
     if (msg.content.startsWith('k!enablelogs')) {
         logs.commands['enablelogs'](msg)
     }
+
+    if (msg.content.startsWith('k!disablelogs')) {
+        logs.commands['disablelogs'](msg)
+    }
+
+    if (msg.content.startsWith('k!changelogs')) {
+        logs.commands['changelogs'](msg)
+    }
 });
 
 client.on("guildCreate", async function(guild){
@@ -149,7 +157,7 @@ client.on("guildCreate", async function(guild){
 });
 
 client.on("messageDelete", function(msg){
-    connection.query("SELECT * FROM `messages_logs` WHERE `serverid` = ? AND `enabled` = ?", [msg.guild.id, 1], async function (err, isEnabled, f) {
+    connection.query("SELECT * FROM `messages_logs` WHERE `serverid` = ?", [msg.guild.id], async function (err, isEnabled, f) {
         if (isEnabled.length == 1 && msg.author.id != '823948446758338572'){
             let channel = client.channels.cache.get(isEnabled[0].logschannel)
             let title;
@@ -175,7 +183,7 @@ client.on("messageDelete", function(msg){
 
 
 client.on("messageUpdate", function(oldMessage, newMessage){
-    connection.query("SELECT * FROM `messages_logs` WHERE `serverid` = ? AND `enabled` = ?", [newMessage.guild.id, 1], async function (err, isEnabled, f) {
+    connection.query("SELECT * FROM `messages_logs` WHERE `serverid` = ?", [newMessage.guild.id], async function (err, isEnabled, f) {
         if (isEnabled.length == 1 && newMessage.author.id != '823948446758338572'){
             let channel = client.channels.cache.get(isEnabled[0].logschannel)
             let title = `Before: ${oldMessage.content}\nAfter: ${newMessage.content}`;
