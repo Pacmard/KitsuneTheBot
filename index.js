@@ -4,6 +4,7 @@ const axios = require('axios')
 var mysql = require('mysql');
 var image = require('./commands/image.js')
 var moderation = require('./commands/moderation.js')
+var logs = require('./commands/logs.js')
 const { prefix, token, mysql_user, mysql_passwd, mysql_db } = require('./config.json');
 
 var connection = mysql.createConnection({
@@ -19,6 +20,7 @@ connection.connect(function(err) {
     }
     console.log('connected as id ' + connection.threadId);
 });
+
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -41,8 +43,6 @@ client.on('ready', async () => {
 });
 
 client.on('message', async msg => {
-
-
     if (msg.content.startsWith('k!help')) {
         const embed = new Discord.MessageEmbed()
             .setTitle("Help")
@@ -107,6 +107,10 @@ client.on('message', async msg => {
     if (msg.content.startsWith('k!unmute')) {
         moderation.commands['unmute'](msg)
     }
+
+    if (msg.content.startsWith('k!enablelogs')) {
+        logs.commands['enablelogs'](msg)
+    }
 });
 
 client.on("guildCreate", async function(guild){
@@ -144,4 +148,55 @@ client.on("guildCreate", async function(guild){
     }
 });
 
+client.on("messageDelete", function(msg){
+    connection.query("SELECT * FROM `messages_logs` WHERE `serverid` = ? AND `enabled` = ?", [msg.guild.id, 1], async function (err, isEnabled, f) {
+        if (isEnabled.length == 1 && msg.author.id != '823948446758338572'){
+            let channel = client.channels.cache.get(isEnabled[0].logschannel)
+            let title;
+            let subtitle = `${msg.author.username}#${msg.author.discriminator} deleted message in #${msg.channel.name}`
+            let avatar = msg.author.avatarURL()
+            let dateNow = new Date()
+            let time = `${(dateNow.getHours()).toString().padStart(2,'0')}:${(dateNow.getMinutes()).toString().padStart(2,'0')}:${(dateNow.getSeconds()).toString().padStart(2,'0')}`
+            let footer = `User ID:${msg.author.id} • Today at: ${time}`
+
+            if (msg.attachments.array().length >= 1){
+                title = msg.attachments.array()[0].proxyURL
+            } else {
+                console.log(msg.attachments.array().length)
+                title = `${msg.content}`
+            }
+
+            let embedCreation = await embedGenerator(title, subtitle, footer, avatar)
+            channel.send(embedCreation);
+        }
+    })
+
+});
+
+
+client.on("messageUpdate", function(oldMessage, newMessage){
+    connection.query("SELECT * FROM `messages_logs` WHERE `serverid` = ? AND `enabled` = ?", [newMessage.guild.id, 1], async function (err, isEnabled, f) {
+        if (isEnabled.length == 1 && newMessage.author.id != '823948446758338572'){
+            let channel = client.channels.cache.get(isEnabled[0].logschannel)
+            let title = `Before: ${oldMessage.content}\nAfter: ${newMessage.content}`;
+            let subtitle = `${newMessage.author.username}#${newMessage.author.discriminator} edited message in #${newMessage.channel.name}`
+            let avatar = newMessage.author.avatarURL()
+            let dateNow = new Date()
+            let time = `${(dateNow.getHours()).toString().padStart(2,'0')}:${(dateNow.getMinutes()).toString().padStart(2,'0')}:${(dateNow.getSeconds()).toString().padStart(2,'0')}`
+            let footer = `User ID:${newMessage.author.id} • Today at: ${time}`
+            let embedCreation = await embedGenerator(title, subtitle, footer, avatar)
+            channel.send(embedCreation);
+        }
+    })
+});
+
 client.login(token);
+
+function embedGenerator(title, subtitle, footer, avatar){
+    const embed = new Discord.MessageEmbed()
+        .setColor("#ff9d5a")
+        .setTitle(`${title}`)
+        .setFooter(footer)
+        .setAuthor(subtitle, avatar);
+    return embed;
+}
