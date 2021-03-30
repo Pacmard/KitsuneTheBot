@@ -59,6 +59,17 @@ client.on('message', async msg => {
                         "**k!tickle @mention** - Tickle someone, and they can tickle you too\n",
                 },
                 {
+                    name: "Mod commands",
+                    value:
+                        "**k!ban @mention `reason`** - Ban someone, rules are important!\n" +
+                        "**k!kick @mention `reason`** - Kick someone, if you think he needs to get out!\n" +
+                        "**k!tempmute @mention `time` `reason`** - Don't let spammers do spam!\n*time in hours, should be less than 48.\n" +
+                        "**k!unmute @mention** - If you need to let someone talk again!\n" +
+                        "**k!enablelogs** - Enable message actions logging!\n" +
+                        "**k!disablelogs** - Disable message actions logging!\n" +
+                        "**k!changelogs** - Change channel for message actions logs!\n",
+                },
+                {
                     name: "Other Commands",
                     value: "**k!help** - Show help\n",
                 }
@@ -122,6 +133,9 @@ client.on('message', async msg => {
 });
 
 client.on("guildCreate", async function(guild){
+
+    /*
+
     let role
     await guild.roles.create({
         data: {
@@ -154,6 +168,8 @@ client.on("guildCreate", async function(guild){
             ]);
         }
     }
+
+    */
 });
 
 client.on("messageDelete", function(msg){
@@ -184,7 +200,7 @@ client.on("messageDelete", function(msg){
 
 client.on("messageUpdate", function(oldMessage, newMessage){
     connection.query("SELECT * FROM `messages_logs` WHERE `serverid` = ?", [newMessage.guild.id], async function (err, isEnabled, f) {
-        if (isEnabled.length == 1 && newMessage.author.id != '823948446758338572'){
+        if ((isEnabled.length == 1) && (newMessage.author.id != '823948446758338572') && (newMessage.author.bot == false) && (newMessage.content != oldMessage.content)){
             let channel = client.channels.cache.get(isEnabled[0].logschannel)
             let title = `Before: ${oldMessage.content}\nAfter: ${newMessage.content}`;
             let subtitle = `${newMessage.author.username}#${newMessage.author.discriminator} edited message in #${newMessage.channel.name}`
