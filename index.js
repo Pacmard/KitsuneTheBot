@@ -56,7 +56,9 @@ client.on('message', async msg => {
                         "**k!hug @mention** - Friendly hug from a friend. owo\n" +
                         "**k!kiss @mention** - Just a cute kiss\n" +
                         "**k!slap @mention** - Slap slap, how dare you!\n" +
-                        "**k!tickle @mention** - Tickle someone, and they can tickle you too\n",
+                        "**k!tickle @mention** - Tickle someone, and they can tickle you too\n" +
+                        "**k!lick @mention** - Lick them all!\n" +
+                        "**k!bite @mention** - When lick is not enough!\n",
                 },
                 {
                     name: "Mod commands",
@@ -101,6 +103,14 @@ client.on('message', async msg => {
 
     if (msg.content.startsWith('k!tickle')) {
         image.commands['tickle'](msg)
+    }
+
+    if (msg.content.startsWith('k!lick')) {
+        image.commands['lick'](msg)
+    }
+
+    if (msg.content.startsWith('k!bite')) {
+        image.commands['bite'](msg)
     }
 
     if (msg.content.startsWith('k!ban')) {
@@ -174,7 +184,7 @@ client.on("guildCreate", async function(guild){
 
 client.on("messageDelete", function(msg){
     connection.query("SELECT * FROM `messages_logs` WHERE `serverid` = ?", [msg.guild.id], async function (err, isEnabled, f) {
-        if (isEnabled.length == 1 && msg.author.id != '823948446758338572'){
+        if ((isEnabled.length == 1) && (msg.author.id != '823948446758338572') && (msg.author.bot == false)){
             let channel = client.channels.cache.get(isEnabled[0].logschannel)
             let title;
             let subtitle = `${msg.author.username}#${msg.author.discriminator} deleted message in #${msg.channel.name}`
