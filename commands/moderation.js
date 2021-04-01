@@ -119,7 +119,7 @@ var commands = {
 
                         connection.query("INSERT INTO `mute` (`userid`, `server_id`, `unmute_time`, `reason`) VALUES (?, ?, ?, ?);", [mention.id, serverId, unmute_timestamp, muteReason], async function (error, result, fields) {
 
-                            let role = msg.guild.roles.cache.find(r => r.name === "Muted");
+                            let role = msg.guild.roles.cache.find(r => r.name === "Muted_Kitsune");
                             mutedUser.roles.add(role).catch(console.error);
 
                             const image = `https://i.imgur.com/0IxjsfM.gif`
@@ -160,7 +160,7 @@ var commands = {
 
                    await connection.query("UPDATE `mute` SET `unmute_time` = ? WHERE `mute`.`id` = ?;", [dateNow.toString(), isMuted[0].id], async function (err, isMuted, f) {
 
-                        let role = msg.guild.roles.cache.find(r => r.name === "Muted");
+                        let role = msg.guild.roles.cache.find(r => r.name === "Muted_Kitsune");
                         mutedUser.roles.remove(role).catch(console.error);
                         // UPDATE `mute` SET `unmute_time` = '1616591021' WHERE `mute`.`id` = 23;
                     })

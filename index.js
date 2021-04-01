@@ -33,7 +33,7 @@ client.on('ready', async () => {
                 let time_timeout = raw_timeout - (dateNow*1000)
                 let guildCheck = client.guilds.cache.get(isAnyoneMuted[i].server_id);
                 let mutedUser = await guildCheck.members.fetch(isAnyoneMuted[i].userid);
-                let role = guildCheck.roles.cache.find(r => r.name === "Muted");
+                let role = guildCheck.roles.cache.find(r => r.name === "Muted_Kitsune");
                 setTimeout(() => {
                     mutedUser.roles.remove(role).catch(console.error);
                 }, time_timeout);
@@ -143,13 +143,10 @@ client.on('message', async msg => {
 });
 
 client.on("guildCreate", async function(guild){
-
-    /*
-
     let role
     await guild.roles.create({
         data: {
-            name: 'Muted',
+            name: 'Muted_Kitsune',
             color: 'DEFAULT'
         },
         reason: 'Role for k!tempmute command',
@@ -162,24 +159,12 @@ client.on("guildCreate", async function(guild){
     for (i = 0; i < channelsArr.length; i++){
         if (channelsArr[i].type == 'text'){
             let channel = guild.channels.cache.get(channelsArr[i].id)
-            channel.overwritePermissions([
-                {
-                    id: role,
-                    deny: ['SEND_MESSAGES'],
-                }
-            ]);
+            channel.updateOverwrite(role, {SEND_MESSAGES: false});
         } else if (channelsArr[i].type == 'voice'){
             let channel = guild.channels.cache.get(channelsArr[i].id)
-            channel.overwritePermissions([
-                {
-                    id: role,
-                    deny: ['CONNECT'],
-                }
-            ]);
+            channel.updateOverwrite(role, {CONNECT: false});
         }
     }
-
-    */
 });
 
 client.on("messageDelete", function(msg){
