@@ -23,7 +23,10 @@ connection.connect(function(err) {
 
 
 client.on('ready', async () => {
+    client.user.setActivity('Use k!help to see all commands!');
+
     console.log(`Logged in as ${client.user.tag}!`);
+
     const date = new Date();
     let dateNow = Date.now()/1000 | 0;
     connection.query("SELECT * FROM `mute` WHERE `unmute_time` >= ?", [dateNow], async function (err, isAnyoneMuted, f) {
