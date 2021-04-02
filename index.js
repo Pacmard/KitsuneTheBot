@@ -147,37 +147,6 @@ client.on('message', async msg => {
     if (msg.content.startsWith('k!changelogs')) {
         logs.commands['changelogs'](msg)
     }
-
-    
-
-    if (msg.content.startsWith('k!logroles')) {
-        let guild = client.guilds.cache.get(msg.guild.id);
-        let userId = msg.mentions.users.first().id
-        let mutedUser = await guild.members.fetch(userId);
-        console.log(mutedUser.roles.member._roles)
-        const role = guild.roles.cache.get(mutedUser.roles.member._roles[0]);
-        let roles_remove = mutedUser.roles.member._roles
-        mutedUser.roles.remove(roles_remove).catch(console.error);
-        connection.query("INSERT INTO `muted_roles` (`rolesCache`, `userId`, `guildId`) VALUES (?, ?, ?);", [JSON.stringify(mutedUser.roles.member._roles), msg.author.id, msg.guild.id], async function (error, result, fields) {
-            console.log(error)
-        })
-        setTimeout(() => {
-            mutedUser.roles.add(roles_remove).catch(console.error);
-        }, 10000);
-       // cachedUserRoles = mutedUser.roles.cache
-    }
-
-    if (msg.content.startsWith('k!testrole')){
-        let guild = await client.guilds.cache.get(msg.guild.id);
-        let mutedUser = await guild.members.fetch(msg.author.id);
-        console.log(cachedUserRoles.member._roles)
-       // mutedUser.roles.set(cachedUserRoles).catch(console.error)
-
-       // connection.query("INSERT INTO `muted_roles` (`rolesCache`, `userId`, `guildId`) VALUES (?, ?, ?);", [cachedUserRoles, msg.author.id, msg.guild.id], async function (error, result, fields) {
-       //     console.log(error)
-        //})
-
-        }
 });
 
 client.on("guildCreate", async function(guild){
