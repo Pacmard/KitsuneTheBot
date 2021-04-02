@@ -6,7 +6,6 @@ var image = require('./commands/image.js')
 var moderation = require('./commands/moderation.js')
 var logs = require('./commands/logs.js')
 const { prefix, token, mysql_user, mysql_passwd, mysql_db } = require('./config.json');
-let cachedUserRoles
 
 
 var connection = mysql.createConnection({
@@ -40,9 +39,13 @@ client.on('ready', async () => {
                 let mutedUser = await guildCheck.members.fetch(isAnyoneMuted[i].userid);
                 let role = guildCheck.roles.cache.find(r => r.name === "Muted_Kitsune");
                 let roles_old = JSON.parse(isAnyoneMuted[0].roles)
-                setTimeout(() => {
-                    mutedUser.roles.remove(role).catch(console.error);
-                    mutedUser.roles.add(roles_old).catch(console.error);
+                setTimeout(async () => {
+                    if (roles_old.length >= 1) {
+                        mutedUser.roles.remove(role.id).catch(console.error);
+                        mutedUser.roles.add(roles_old).catch(console.error);
+                    } else {
+                        mutedUser.roles.remove(role.id).catch(console.error);
+                    }
                 }, time_timeout);
             }
         }

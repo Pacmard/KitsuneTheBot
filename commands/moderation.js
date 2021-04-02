@@ -4,12 +4,12 @@ var mysql = require('mysql');
 const { prefix, token, mysql_user, mysql_passwd, mysql_db } = require('../config.json');
 
 var connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : mysql_user,
-    password : mysql_passwd,
-    database : mysql_db
+    host: 'localhost',
+    user: mysql_user,
+    password: mysql_passwd,
+    database: mysql_db
 })
-connection.connect(function(err) {
+connection.connect(function (err) {
     if (err) {
         console.error('error connecting: ' + err.stack);
         return;
@@ -44,7 +44,7 @@ var commands = {
                 banReason = params[0]
             }
 
-            bannedUser.ban({reason: banReason})
+            bannedUser.ban({ reason: banReason })
 
             const image = `https://media1.tenor.com/images/2dfc019556073683716852b293959706/tenor.gif?itemid=17040749`
             let title = `Get banned, ${mention.username}#${mention.discriminator}!`
@@ -79,7 +79,7 @@ var commands = {
             msg.reply(`You don't have permissions to ban people!`)
         }
     },
-    tempmute: async function (msg){
+    tempmute: async function (msg) {
         const mention = msg.mentions.users.first();
         if (!mention) {
             return msg.reply("Please, specify the user!");
@@ -95,9 +95,9 @@ var commands = {
             let mutedUser = msg.guild.members.resolve(mention.id);
             let serverId = msg.guild.id;
             const date = new Date();
-            let dateNow = Date.now()/1000 | 0;
+            let dateNow = Date.now() / 1000 | 0;
             connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` >= ?", [mention.id, serverId, dateNow], async function (err, isMuted, f) {
-                if (isMuted.length == 0){
+                if (isMuted.length == 0) {
 
                     removingCmdsVars = msg.content.replace(`k!tempmute`, ``).replace(`<@!${mention.id}>`, ``).replace(`<@${mention.id}>`, ``);
                     params = removingCmdsVars.trimStart().replace(/ +(?= )/g, '');
@@ -112,17 +112,17 @@ var commands = {
                     }
 
                     let muteTime = parseInt(paramsSplit[0])
-                    if (Number.isInteger(muteTime) && muteTime <= 48){
+                    if (Number.isInteger(muteTime) && muteTime <= 48) {
 
                         let unmute_time = 3600 * muteTime
                         let unmute_timestamp = dateNow + unmute_time
                         let roles_before = mutedUser.roles.member._roles;
                         let roles_JSON = JSON.stringify(roles_before);
-                        connection.query("INSERT INTO `mute` (`userid`, `roles`, `server_id`, `unmute_time`, `reason`) VALUES (?, ?, ?, ?, ?);", [mention.id, roles_JSON ,serverId, unmute_timestamp, muteReason], async function (error, result, fields) {
+                        connection.query("INSERT INTO `mute` (`userid`, `roles`, `server_id`, `unmute_time`, `reason`) VALUES (?, ?, ?, ?, ?);", [mention.id, roles_JSON, serverId, unmute_timestamp, muteReason], async function (error, result, fields) {
 
                             let role = msg.guild.roles.cache.find(r => r.name === "Muted_Kitsune");
+                            await mutedUser.roles.remove(roles_before).catch(console.error);
                             mutedUser.roles.add(role).catch(console.error);
-                            mutedUser.roles.remove(roles_before).catch(console.error);
 
                             const image = `https://i.imgur.com/0IxjsfM.gif`
                             let title = `Get muted, ${mention.username}#${mention.discriminator}!`
@@ -142,7 +142,7 @@ var commands = {
             msg.reply(`You don't have permissions to mute people!`)
         }
     },
-    unmute: async function (msg){
+    unmute: async function (msg) {
         const mention = msg.mentions.users.first();
         if (!mention) {
             return msg.reply("Please, specify the user!");
@@ -155,20 +155,23 @@ var commands = {
         if (perms.has('MANAGE_MESSAGES') || perms.has('KICK_MEMBERS') || perms.has('BAN_MEMBERS') || perms.has('MANAGE_ROLES')) {
             let serverId = msg.guild.id;
             const date = new Date();
-            let dateNow = Date.now()/1000 | 0;
+            let dateNow = Date.now() / 1000 | 0;
             connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` >= ?", [mention.id, serverId, dateNow], async function (err, isMuted, f) {
-                if (isMuted.length == 1){
+                if (isMuted.length == 1) {
                     let mutedUser = msg.guild.members.resolve(mention.id);
-
-                   await connection.query("UPDATE `mute` SET `unmute_time` = ? WHERE `mute`.`id` = ?;", [dateNow.toString(), isMuted[0].id], async function (err, res_upd, f) {
-
-                        let role = msg.guild.roles.cache.find(r => r.name === "Muted_Kitsune");
-                        let roles_old = JSON.parse(isMuted[0].roles)
-                        
-                        mutedUser.roles.remove(role).catch(console.error);
-                        mutedUser.roles.add(roles_old).catch(console.error);
-
+                    await connection.query("UPDATE `mute` SET `unmute_time` = ? WHERE `mute`.`id` = ?;", [dateNow.toString(), isMuted[0].id], async function (err, res_upd, f) {
                     })
+
+                    let role_remove = msg.guild.roles.cache.find(r => r.name === "Muted_Kitsune");
+                    let roles_old = JSON.parse(isMuted[0].roles)
+
+                    if (roles_old.length >= 1) {
+                        mutedUser.roles.remove(role_remove.id).catch(console.error);
+                        mutedUser.roles.add(roles_old).catch(console.error);
+                    } else {
+                        mutedUser.roles.remove(role_remove.id).catch(console.error);
+                    }
+
 
                     const image = `https://media.tenor.com/images/7f9d13686d8d6b73d669c618ccb0afac/tenor.gif`
                     let title = `Yay, ${mention.username}#${mention.discriminator} got unmuted!`
@@ -183,7 +186,7 @@ var commands = {
     }
 }
 
-function embedGenerator(title, image, subtitle){
+function embedGenerator(title, image, subtitle) {
     const embed = new Discord.MessageEmbed()
         .setColor("#ff9d5a")
         .setTitle(title)
