@@ -116,18 +116,20 @@ var commands = {
 
                         let unmute_time = 3600 * muteTime
                         let unmute_timestamp = dateNow + unmute_time
-
-                        connection.query("INSERT INTO `mute` (`userid`, `server_id`, `unmute_time`, `reason`) VALUES (?, ?, ?, ?);", [mention.id, serverId, unmute_timestamp, muteReason], async function (error, result, fields) {
+                        let roles_before = mutedUser.roles.member._roles;
+                        let roles_JSON = JSON.stringify(roles_before);
+                        connection.query("INSERT INTO `mute` (`userid`, `roles`, `server_id`, `unmute_time`, `reason`) VALUES (?, ?, ?, ?, ?);", [mention.id, roles_JSON ,serverId, unmute_timestamp, muteReason], async function (error, result, fields) {
 
                             let role = msg.guild.roles.cache.find(r => r.name === "Muted_Kitsune");
                             mutedUser.roles.add(role).catch(console.error);
+                            mutedUser.roles.remove(roles_before).catch(console.error);
 
                             const image = `https://i.imgur.com/0IxjsfM.gif`
                             let title = `Get muted, ${mention.username}#${mention.discriminator}!`
                             let subtitle = `${msg.author.username} mutes ${mention.username}`
                             let embedCreation = await embedGenerator(title, image, subtitle)
                             msg.channel.send(embedCreation);
-                            timeout(msg, mutedUser, role, unmute_time)
+                            timeout(msg, mutedUser, role, unmute_time, roles_before)
 
                         })
 
@@ -158,11 +160,14 @@ var commands = {
                 if (isMuted.length == 1){
                     let mutedUser = msg.guild.members.resolve(mention.id);
 
-                   await connection.query("UPDATE `mute` SET `unmute_time` = ? WHERE `mute`.`id` = ?;", [dateNow.toString(), isMuted[0].id], async function (err, isMuted, f) {
+                   await connection.query("UPDATE `mute` SET `unmute_time` = ? WHERE `mute`.`id` = ?;", [dateNow.toString(), isMuted[0].id], async function (err, res_upd, f) {
 
                         let role = msg.guild.roles.cache.find(r => r.name === "Muted_Kitsune");
+                        let roles_old = JSON.parse(isMuted[0].roles)
+                        
                         mutedUser.roles.remove(role).catch(console.error);
-                        // UPDATE `mute` SET `unmute_time` = '1616591021' WHERE `mute`.`id` = 23;
+                        mutedUser.roles.add(roles_old).catch(console.error);
+
                     })
 
                     const image = `https://media.tenor.com/images/7f9d13686d8d6b73d669c618ccb0afac/tenor.gif`
@@ -188,10 +193,11 @@ function embedGenerator(title, image, subtitle){
     return embed;
 }
 
-function timeout(msg, mutedUser, role, unmute_time) {
+function timeout(msg, mutedUser, role, unmute_time, roles_before) {
     let time_timeout = unmute_time * 1000
     setTimeout(() => {
         mutedUser.roles.remove(role).catch(console.error);
+        mutedUser.roles.add(roles_before).catch(console.error);
     }, time_timeout);
 }
 
