@@ -96,7 +96,7 @@ var commands = {
             let serverId = msg.guild.id;
             const date = new Date();
             let dateNow = Date.now() / 1000 | 0;
-            connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` >= ?", [mention.id, serverId, dateNow], async function (err, isMuted, f) {
+            connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` >= ? AND `is_unmuted` = ?", [mention.id, serverId, dateNow, 0], async function (err, isMuted, f) {
                 if (isMuted.length == 0) {
 
                     removingCmdsVars = msg.content.replace(`k!tempmute`, ``).replace(`<@!${mention.id}>`, ``).replace(`<@${mention.id}>`, ``);
@@ -118,7 +118,7 @@ var commands = {
                         let unmute_timestamp = dateNow + unmute_time
                         let roles_before = mutedUser.roles.member._roles;
                         let roles_JSON = JSON.stringify(roles_before);
-                        connection.query("INSERT INTO `mute` (`userid`, `roles`, `server_id`, `unmute_time`, `reason`) VALUES (?, ?, ?, ?, ?);", [mention.id, roles_JSON, serverId, unmute_timestamp, muteReason], async function (error, result, fields) {
+                        connection.query("INSERT INTO `mute` (`userid`, `roles`, `server_id`, `unmute_time`, `reason`, `is_unmuted`) VALUES (?, ?, ?, ?, ?, ?);", [mention.id, roles_JSON, serverId, unmute_timestamp, muteReason, 0], async function (error, result, fields) {
 
                             let role = msg.guild.roles.cache.find(r => r.name === "Muted_Kitsune");
                             await mutedUser.roles.remove(roles_before).catch(console.error);
@@ -129,7 +129,9 @@ var commands = {
                             let subtitle = `${msg.author.username} mutes ${mention.username}`
                             let embedCreation = await embedGenerator(title, image, subtitle)
                             msg.channel.send(embedCreation);
-                            timeout(msg, mutedUser, role, unmute_time, roles_before)
+
+                            let user_id = mention.id;
+                            timeout(msg, mutedUser, role, unmute_time, roles_before, user_id, serverId)
 
                         })
 
@@ -156,10 +158,10 @@ var commands = {
             let serverId = msg.guild.id;
             const date = new Date();
             let dateNow = Date.now() / 1000 | 0;
-            connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` >= ?", [mention.id, serverId, dateNow], async function (err, isMuted, f) {
+            connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` >= ? AND `is_unmuted` = ?", [mention.id, serverId, dateNow, 0], async function (err, isMuted, f) {
                 if (isMuted.length == 1) {
                     let mutedUser = msg.guild.members.resolve(mention.id);
-                    await connection.query("UPDATE `mute` SET `unmute_time` = ? WHERE `mute`.`id` = ?;", [dateNow.toString(), isMuted[0].id], async function (err, res_upd, f) {
+                    await connection.query("UPDATE `mute` SET `unmute_time` = ?, `is_unmuted` = ? WHERE `mute`.`id` = ?;", [dateNow.toString(), 1, isMuted[0].id], async function (err, res_upd, f) {
                     })
 
                     let role_remove = msg.guild.roles.cache.find(r => r.name === "Muted_Kitsune");
@@ -167,8 +169,8 @@ var commands = {
 
                     if (roles_old.length >= 1) {
                         await mutedUser.roles.add(roles_old).catch(console.error);
-                         mutedUser.roles.remove(role_remove.id).catch(console.error);
-                        
+                        mutedUser.roles.remove(role_remove.id).catch(console.error);
+
                     } else {
                         await mutedUser.roles.remove(role_remove.id).catch(console.error);
                     }
@@ -197,11 +199,17 @@ function embedGenerator(title, image, subtitle) {
     return embed;
 }
 
-function timeout(msg, mutedUser, role, unmute_time, roles_before) {
+function timeout(msg, mutedUser, role, unmute_time, roles_before, user_id, serverId) {
     let time_timeout = unmute_time * 1000
     setTimeout(() => {
-        mutedUser.roles.remove(role).catch(console.error);
-        mutedUser.roles.add(roles_before).catch(console.error);
+        connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `is_unmuted` = ?", [user_id, serverId, unmute_time, 0], async function (err, isMuted, f) {
+            if (isMuted.length == 1) {
+                await connection.query("UPDATE `mute` SET `is_unmuted` = ? WHERE `mute`.`id` = ?;", [1, isMuted[0].id], async function (err, res_upd, f) {
+                    await mutedUser.roles.add(roles_before).catch(console.error);
+                    mutedUser.roles.remove(role).catch(console.error);
+                })
+            }
+        })
     }, time_timeout);
 }
 

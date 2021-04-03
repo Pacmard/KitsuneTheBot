@@ -1,7 +1,7 @@
 const axios = require('axios');
 const Discord = require('discord.js');
 var commands = {
-    cuddle: async function (msg){
+    cuddle: async function (msg) {
         const mention = msg.mentions.users.first();
         if (!mention) {
             return msg.reply("tell me, how does it feel to cuddle air?");
@@ -22,7 +22,7 @@ var commands = {
         let embedCreation = await embedGenerator(title, image, subtitle)
         return msg.channel.send(embedCreation);
     },
-    pat: async function (msg){
+    pat: async function (msg) {
         const mention = msg.mentions.users.first();
 
         if (!mention) {
@@ -44,7 +44,7 @@ var commands = {
         let embedCreation = await embedGenerator(title, image, subtitle)
         return msg.channel.send(embedCreation);
     },
-    kiss: async function (msg){
+    kiss: async function (msg) {
         const mention = msg.mentions.users.first();
 
         if (!mention) {
@@ -66,7 +66,7 @@ var commands = {
         let embedCreation = await embedGenerator(title, image, subtitle)
         return msg.channel.send(embedCreation);
     },
-    slap: async function (msg){
+    slap: async function (msg) {
         const mention = msg.mentions.users.first();
 
         if (!mention) {
@@ -88,7 +88,7 @@ var commands = {
         let embedCreation = await embedGenerator(title, image, subtitle)
         return msg.channel.send(embedCreation);
     },
-    hug: async function (msg){
+    hug: async function (msg) {
         const mention = msg.mentions.users.first();
 
         if (!mention) {
@@ -110,7 +110,7 @@ var commands = {
         let embedCreation = await embedGenerator(title, image, subtitle)
         return msg.channel.send(embedCreation);
     },
-    tickle: async function (msg){
+    tickle: async function (msg) {
         const mention = msg.mentions.users.first();
 
         if (!mention) {
@@ -132,7 +132,7 @@ var commands = {
         let embedCreation = await embedGenerator(title, image, subtitle)
         return msg.channel.send(embedCreation);
     },
-    lick: async function (msg){
+    lick: async function (msg) {
         const mention = msg.mentions.users.first();
 
         if (!mention) {
@@ -162,7 +162,7 @@ var commands = {
         let embedCreation = await embedGenerator(title, image, subtitle)
         return msg.channel.send(embedCreation);
     },
-    bite: async function (msg){
+    bite: async function (msg) {
         const mention = msg.mentions.users.first();
 
         if (!mention) {
@@ -195,7 +195,7 @@ var commands = {
         let embedCreation = await embedGenerator(title, image, subtitle)
         return msg.channel.send(embedCreation);
     },
-    fluff: async function (msg){
+    fluff: async function (msg) {
         const mention = msg.mentions.users.first();
 
         if (!mention) {
@@ -226,7 +226,7 @@ var commands = {
     }
 }
 
-function embedGenerator(title, image, subtitle){
+function embedGenerator(title, image, subtitle) {
     const embed = new Discord.MessageEmbed()
         .setColor("#ff9d5a")
         .setTitle(title)

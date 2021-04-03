@@ -4,12 +4,12 @@ var mysql = require('mysql');
 const { prefix, token, mysql_user, mysql_passwd, mysql_db } = require('../config.json');
 
 var connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : mysql_user,
-    password : mysql_passwd,
-    database : mysql_db
+    host: 'localhost',
+    user: mysql_user,
+    password: mysql_passwd,
+    database: mysql_db
 })
-connection.connect(function(err) {
+connection.connect(function (err) {
     if (err) {
         console.error('error connecting: ' + err.stack);
         return;
@@ -108,7 +108,7 @@ var commands = {
     }
 }
 
-function embedGenerator(title, image, subtitle){
+function embedGenerator(title, image, subtitle) {
     const embed = new Discord.MessageEmbed()
         .setColor("#ff9d5a")
         .setTitle(title)
