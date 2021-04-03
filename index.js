@@ -41,18 +41,16 @@ client.on('ready', async () => {
                 let roles_old = JSON.parse(isAnyoneMuted[i].roles)
                 setTimeout(async () => {
                     connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `is_unmuted` = ?", [isAnyoneMuted[i].userid, isAnyoneMuted[i].server_id, isAnyoneMuted[i].unmute_time, 0], async function (err, isMutedNow, f) {
-                        await connection.query("UPDATE `mute` SET `is_unmuted` = ? WHERE `mute`.`id` = ?;", [1, isAnyoneMuted[i].id], async function (err, res_upd, f) {
-                            if (isMutedNow.length == 1) {
+                        if (isMutedNow.length == 1) {
+                            await connection.query("UPDATE `mute` SET `is_unmuted` = ? WHERE `mute`.`id` = ?;", [1, isAnyoneMuted[i].id], async function (err, res_upd, f) {
                                 if (roles_old.length >= 1) {
                                     await mutedUser.roles.add(roles_old).catch(console.error);
                                     mutedUser.roles.remove(role.id).catch(console.error);
                                 } else {
                                     mutedUser.roles.remove(role.id).catch(console.error);
                                 }
-                            }
-
-                        })
-
+                            })
+                        }
                     })
                 }, time_timeout);
             }
