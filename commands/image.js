@@ -194,6 +194,35 @@ var commands = {
         let subtitle = `${msg.author.username} bites ${mention.username}`
         let embedCreation = await embedGenerator(title, image, subtitle)
         return msg.channel.send(embedCreation);
+    },
+    fluff: async function (msg){
+        const mention = msg.mentions.users.first();
+
+        if (!mention) {
+            return msg.reply("Is air really that fluffy?");
+        }
+
+        if (mention.id === msg.author.id) {
+            return msg.reply("How does it feel to fluff youself?");
+        }
+
+        const imageArr = [
+            `https://media1.tenor.com/images/641c82c25278968b8c7019765642117d/tenor.gif?itemid=20999243`,
+            `https://media1.tenor.com/images/7a024f4f3391f86be7f2d09bfbebbf35/tenor.gif?itemid=20999240`,
+            `https://media1.tenor.com/images/010a7933835d915ca383d741c778ac88/tenor.gif?itemid=20999237`,
+            `https://media1.tenor.com/images/1dc6c1467fdd2c2f17c58e36f62b61d9/tenor.gif?itemid=20999234`,
+            `https://media1.tenor.com/images/003a88ad8c5d43b34f8490c28bf10dae/tenor.gif?itemid=20999232`,
+            `https://media1.tenor.com/images/e2bb75681021339a2ffc96ad47da2c9c/tenor.gif?itemid=20999227`,
+            `https://media1.tenor.com/images/c7205d518b68b7ef49fd1e8d2d4fe505/tenor.gif?itemid=20999230`,
+            `https://media.tenor.com/images/a93c9e811afc06a2c7d79cbc3d68f09b/tenor.gif`
+        ]
+
+        let picNumber = Math.floor(Math.random() * 8)
+        const image = imageArr[picNumber]
+        let title = `Sorry, you will be fluffed ${mention.username}!`
+        let subtitle = `${msg.author.username} fluffs ${mention.username} tail!`
+        let embedCreation = await embedGenerator(title, image, subtitle)
+        return msg.channel.send(embedCreation);
     }
 }
 
@@ -202,7 +231,7 @@ function embedGenerator(title, image, subtitle){
         .setColor("#ff9d5a")
         .setTitle(title)
         .setImage(image)
-        .setFooter(`Kitsune v0.0.1`)
+        .setFooter(`KitsuneTheBot v0.0.1`)
         .setAuthor(subtitle);
     return embed;
 }

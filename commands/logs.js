@@ -113,7 +113,7 @@ function embedGenerator(title, image, subtitle){
         .setColor("#ff9d5a")
         .setTitle(title)
         .setImage(image)
-        .setFooter(`Kitsune v0.0.1`)
+        .setFooter(`KitsuneTheBot v0.0.1`)
         .setAuthor(subtitle);
     return embed;
 }

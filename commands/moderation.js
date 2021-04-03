@@ -166,10 +166,11 @@ var commands = {
                     let roles_old = JSON.parse(isMuted[0].roles)
 
                     if (roles_old.length >= 1) {
-                        mutedUser.roles.remove(role_remove.id).catch(console.error);
-                        mutedUser.roles.add(roles_old).catch(console.error);
+                        await mutedUser.roles.add(roles_old).catch(console.error);
+                         mutedUser.roles.remove(role_remove.id).catch(console.error);
+                        
                     } else {
-                        mutedUser.roles.remove(role_remove.id).catch(console.error);
+                        await mutedUser.roles.remove(role_remove.id).catch(console.error);
                     }
 
 
@@ -191,7 +192,7 @@ function embedGenerator(title, image, subtitle) {
         .setColor("#ff9d5a")
         .setTitle(title)
         .setImage(image)
-        .setFooter(`Kitsune v0.0.1`)
+        .setFooter(`KitsuneTheBot v0.0.1`)
         .setAuthor(subtitle);
     return embed;
 }

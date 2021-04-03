@@ -41,8 +41,8 @@ client.on('ready', async () => {
                 let roles_old = JSON.parse(isAnyoneMuted[0].roles)
                 setTimeout(async () => {
                     if (roles_old.length >= 1) {
-                        mutedUser.roles.remove(role.id).catch(console.error);
-                        mutedUser.roles.add(roles_old).catch(console.error);
+                        await mutedUser.roles.add(roles_old).catch(console.error);
+                       mutedUser.roles.remove(role.id).catch(console.error);
                     } else {
                         mutedUser.roles.remove(role.id).catch(console.error);
                     }
@@ -121,6 +121,10 @@ client.on('message', async msg => {
 
     if (msg.content.startsWith('k!bite')) {
         image.commands['bite'](msg)
+    }
+
+    if (msg.content.startsWith('k!fluff')) {
+        image.commands['fluff'](msg)
     }
 
     if (msg.content.startsWith('k!ban')) {
