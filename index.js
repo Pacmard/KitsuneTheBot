@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
-const client = new Discord.Client();
+const client = new Discord.Client({ partials: ['GUILD_MEMBER'] });
 const axios = require('axios')
+const moment = require('moment')
 var mysql = require('mysql');
 var image = require('./commands/image.js')
 var moderation = require('./commands/moderation.js')
@@ -82,10 +83,17 @@ client.on('message', async msg => {
                         "**k!ban @mention `reason`** - Ban someone, rules are important!\n" +
                         "**k!kick @mention `reason`** - Kick someone, if you think he needs to get out!\n" +
                         "**k!tempmute @mention `time` `reason`** - Don't let spammers do spam!\n*time in hours, should be less than 48.\n" +
-                        "**k!unmute @mention** - If you need to let someone talk again!\n" +
+                        "**k!unmute @mention** - If you need to let someone talk again!\n",
+                },
+                {
+                    name: "Logs commands",
+                    value:
                         "**k!enablelogs** - Enable message actions logging!\n" +
                         "**k!disablelogs** - Disable message actions logging!\n" +
-                        "**k!changelogs** - Change channel for message actions logs!\n",
+                        "**k!changelogs** - Change channel for message actions logs!\n\n" +
+                        "**k!enableleave** - Enable server leave logging!\n" +
+                        "**k!disableleave** - Disable server leave logging!\n" + 
+                        "**k!changeleave** - Change channel for server leave logs!\n",
                 },
                 {
                     name: "Other Commands",
@@ -160,6 +168,18 @@ client.on('message', async msg => {
     if (msg.content.startsWith('k!changelogs')) {
         logs.commands['changelogs'](msg)
     }
+
+    if (msg.content.startsWith('k!enableleave')) {
+        logs.commands['enableleave'](msg)
+    }
+
+    if (msg.content.startsWith('k!disableleave')) {
+        logs.commands['disableleave'](msg)
+    }
+
+    if (msg.content.startsWith('k!changeleave')) {
+        logs.commands['changeleave'](msg)
+    }
 });
 
 client.on("guildCreate", async function (guild) {
@@ -185,6 +205,24 @@ client.on("guildCreate", async function (guild) {
             channel.updateOverwrite(role, { CONNECT: false });
         }
     }
+
+
+    let guildArr = await guild.members.fetch()
+
+
+    guildArr.forEach(member => {
+        connection.query("SELECT * FROM `user_info` WHERE `userid` = ? AND `serverid` = ?", [member.user.id, member.guild.id], async function (err, userInfo, f) {
+            if (userInfo.length == 0) {
+                let joinedUnix = member.joinedTimestamp / 1000 | 0;
+                let userRoles = JSON.stringify(member._roles)
+                connection.query("INSERT INTO `user_info` (`userid`, `serverid`, `joinTimestamp`, `roles`) VALUES (?, ?, ?, ?);", [member.user.id, member.guild.id, joinedUnix, userRoles], async function (error, result, fields) {
+
+                })
+            }
+        })
+    });
+
+
 });
 
 client.on("messageDelete", function (msg) {
@@ -228,12 +266,59 @@ client.on("messageUpdate", function (oldMessage, newMessage) {
     })
 });
 
+client.on("guildMemberRemove", function (member) {
+    connection.query("SELECT * FROM `leave_logs` WHERE `serverid` = ?", [member.guild.id], async function (err, isEnabled, f) {
+        if ((isEnabled.length == 1)) {
+            connection.query("SELECT * FROM `user_info` WHERE `userid` = ? AND `serverid` = ?", [member.user.id, member.guild.id], async function (err, userInfo, f) {
+                let channel = client.channels.cache.get(isEnabled[0].logschannel)
+                let datejoined = userInfo[0].joinTimestamp;
+                let dateNow = new Date();
+                let wasOnServer = moment.unix(datejoined).fromNow();
+                let userRolesLeft = member._roles
+                let title = `Joined: ${wasOnServer}`;
+                let desc = `Roles: ${userRolesLeft.map(item => `<@&${item}>`).join(', ')}`
+                let subtitle = `${member.user.username}#${member.user.discriminator} left the server.`
+                let avatar = member.user.avatarURL()
+                let time = `${(dateNow.getHours()).toString().padStart(2, '0')}:${(dateNow.getMinutes()).toString().padStart(2, '0')}:${(dateNow.getSeconds()).toString().padStart(2, '0')}`
+                let footer = `User ID:${member.user.id} • Today at: ${time}`
+                let embedCreation = await leaveEmbedGenerator(title, subtitle, footer, avatar, desc)
+                channel.send(embedCreation);
+            })
+        }
+    })
+
+});
+
+client.on("guildMemberAdd", function (member) {
+    connection.query("SELECT * FROM `user_info` WHERE `userid` = ? AND `serverid` = ?", [member.user.id, member.guild.id], async function (err, userInfo, f) {
+        if (userInfo.length == 0) {
+            let joinedUnix = member.joinedTimestamp / 1000 | 0;
+            let userRoles = JSON.stringify(member._roles)
+            connection.query("INSERT INTO `user_info` (`userid`, `serverid`, `joinTimestamp`, `roles`) VALUES (?, ?, ?, ?);", [member.user.id, member.guild.id, joinedUnix, userRoles], async function (error, result, fields) { })
+        } else {
+            let dateNow = Date.now() / 1000 | 0;
+            connection.query("UPDATE `user_info` SET `joinTimestamp` = ? WHERE `user_info`.`id` = ?;", [dateNow, userInfo[0].id], async function (err, res_upd, f) { })
+            // member.roles.add(userInfo[0].roles).catch(console.error);
+        }
+    })
+});
+
 client.login(token);
 
 function embedGenerator(title, subtitle, footer, avatar) {
     const embed = new Discord.MessageEmbed()
         .setColor("#ff9d5a")
         .setTitle(`${title}`)
+        .setFooter(footer)
+        .setAuthor(subtitle, avatar);
+    return embed;
+}
+
+function leaveEmbedGenerator(title, subtitle, footer, avatar, desc) {
+    const embed = new Discord.MessageEmbed()
+        .setColor("#ff9d5a")
+        .setTitle(`${title}`)
+        .setDescription(desc)
         .setFooter(footer)
         .setAuthor(subtitle, avatar);
     return embed;
