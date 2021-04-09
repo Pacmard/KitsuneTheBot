@@ -60,7 +60,7 @@ client.on('ready', async () => {
 });
 
 client.on('message', async msg => {
-    if (msg.content.startsWith('k!help')) {
+    if (msg.content.toLowerCase().startsWith('k!help')) {
         const embed = new Discord.MessageEmbed()
             .setTitle("Help")
             .setDescription("Hey there, I'm KitsuneTheBot and I'm here to pamper you!")
@@ -92,7 +92,7 @@ client.on('message', async msg => {
                         "**k!disablelogs** - Disable message actions logging!\n" +
                         "**k!changelogs** - Change channel for message actions logs!\n\n" +
                         "**k!enableleave** - Enable server leave logging!\n" +
-                        "**k!disableleave** - Disable server leave logging!\n" + 
+                        "**k!disableleave** - Disable server leave logging!\n" +
                         "**k!changeleave** - Change channel for server leave logs!\n",
                 },
                 {
@@ -105,79 +105,79 @@ client.on('message', async msg => {
         msg.channel.send(embed);
     }
 
-    if (msg.content.startsWith('k!cuddle')) {
+    if (msg.content.toLowerCase().startsWith('k!cuddle')) {
         image.commands['cuddle'](msg)
     }
 
-    if (msg.content.startsWith('k!pat')) {
+    if (msg.content.toLowerCase().startsWith('k!pat')) {
         image.commands['pat'](msg)
     }
 
-    if (msg.content.startsWith('k!kiss')) {
+    if (msg.content.toLowerCase().startsWith('k!kiss')) {
         image.commands['kiss'](msg)
     }
 
-    if (msg.content.startsWith('k!slap')) {
+    if (msg.content.toLowerCase().startsWith('k!slap')) {
         image.commands['slap'](msg)
     }
 
-    if (msg.content.startsWith('k!hug')) {
+    if (msg.content.toLowerCase().startsWith('k!hug')) {
         image.commands['hug'](msg)
     }
 
-    if (msg.content.startsWith('k!tickle')) {
+    if (msg.content.toLowerCase().startsWith('k!tickle')) {
         image.commands['tickle'](msg)
     }
 
-    if (msg.content.startsWith('k!lick')) {
+    if (msg.content.toLowerCase().startsWith('k!lick')) {
         image.commands['lick'](msg)
     }
 
-    if (msg.content.startsWith('k!bite')) {
+    if (msg.content.toLowerCase().startsWith('k!bite')) {
         image.commands['bite'](msg)
     }
 
-    if (msg.content.startsWith('k!fluff')) {
+    if (msg.content.toLowerCase().startsWith('k!fluff')) {
         image.commands['fluff'](msg)
     }
 
-    if (msg.content.startsWith('k!ban')) {
+    if (msg.content.toLowerCase().startsWith('k!ban')) {
         moderation.commands['ban'](msg)
     }
 
-    if (msg.content.startsWith('k!kick')) {
+    if (msg.content.toLowerCase().startsWith('k!kick')) {
         moderation.commands['kick'](msg)
     }
 
-    if (msg.content.startsWith('k!tempmute')) {
+    if (msg.content.toLowerCase().startsWith('k!tempmute')) {
         moderation.commands['tempmute'](msg)
     }
 
-    if (msg.content.startsWith('k!unmute')) {
+    if (msg.content.toLowerCase().startsWith('k!unmute')) {
         moderation.commands['unmute'](msg)
     }
 
-    if (msg.content.startsWith('k!enablelogs')) {
+    if (msg.content.toLowerCase().startsWith('k!enablelogs')) {
         logs.commands['enablelogs'](msg)
     }
 
-    if (msg.content.startsWith('k!disablelogs')) {
+    if (msg.content.toLowerCase().startsWith('k!disablelogs')) {
         logs.commands['disablelogs'](msg)
     }
 
-    if (msg.content.startsWith('k!changelogs')) {
+    if (msg.content.toLowerCase().startsWith('k!changelogs')) {
         logs.commands['changelogs'](msg)
     }
 
-    if (msg.content.startsWith('k!enableleave')) {
+    if (msg.content.toLowerCase().startsWith('k!enableleave')) {
         logs.commands['enableleave'](msg)
     }
 
-    if (msg.content.startsWith('k!disableleave')) {
+    if (msg.content.toLowerCase().startsWith('k!disableleave')) {
         logs.commands['disableleave'](msg)
     }
 
-    if (msg.content.startsWith('k!changeleave')) {
+    if (msg.content.toLowerCase().startsWith('k!changeleave')) {
         logs.commands['changeleave'](msg)
     }
 });
@@ -274,7 +274,7 @@ client.on("guildMemberRemove", function (member) {
                 let datejoined = userInfo[0].joinTimestamp;
                 let dateNow = new Date();
                 let wasOnServer = moment.unix(datejoined).fromNow();
-                let userRolesLeft = member._roles
+                let userRolesLeft = JSON.parse(userInfo[0].roles)
                 let title = `Joined: ${wasOnServer}`;
                 let desc = `Roles: ${userRolesLeft.map(item => `<@&${item}>`).join(', ')}`
                 let subtitle = `${member.user.username}#${member.user.discriminator} left the server.`
@@ -303,6 +303,23 @@ client.on("guildMemberAdd", function (member) {
     })
 });
 
+
+client.on("guildMemberUpdate", function (oldMember, newMember) {
+    oldMember.roles.cache.forEach(role => {
+        if (!newMember.roles.cache.has(role.id)) {
+            updateRoles(newMember)
+        }
+    }); // check if role removed
+
+
+    newMember.roles.cache.forEach(role => {
+        if (!oldMember.roles.cache.has(role.id)) {
+            updateRoles(newMember)
+        }
+    }); // check if role removed
+
+});
+
 client.login(token);
 
 function embedGenerator(title, subtitle, footer, avatar) {
@@ -322,4 +339,14 @@ function leaveEmbedGenerator(title, subtitle, footer, avatar, desc) {
         .setFooter(footer)
         .setAuthor(subtitle, avatar);
     return embed;
+}
+
+function updateRoles(newMember) {
+    connection.query("SELECT * FROM `user_info` WHERE `userid` = ? AND `serverid` = ?", [newMember.user.id, newMember.guild.id], async function (err, userInfo, f) {
+        console.log(err)
+        if (userInfo.length == 1) {
+            let newRoles = JSON.stringify(newMember._roles)
+            connection.query("UPDATE `user_info` SET `roles` = ? WHERE `user_info`.`id` = ?;", [newRoles, userInfo[0].id], async function (error, res_upd, f) { console.log(error) })
+        } else console.log(userInfo.length)
+    })
 }
