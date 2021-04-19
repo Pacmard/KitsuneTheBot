@@ -229,7 +229,7 @@ client.on("messageDelete", function (msg) {
     connection.query("SELECT * FROM `messages_logs` WHERE `serverid` = ?", [msg.guild.id], async function (err, isEnabled, f) {
         if ((isEnabled.length == 1) && (msg.author.id != '823948446758338572') && (msg.author.bot == false)) {
             let channel = client.channels.cache.get(isEnabled[0].logschannel)
-            let title;
+            let descriprion;
             let subtitle = `${msg.author.username}#${msg.author.discriminator} deleted message in #${msg.channel.name}`
             let avatar = msg.author.avatarURL()
             let dateNow = new Date()
@@ -237,12 +237,20 @@ client.on("messageDelete", function (msg) {
             let footer = `User ID:${msg.author.id} • Today at: ${time}`
 
             if (msg.attachments.array().length >= 1) {
-                title = msg.attachments.array()[0].proxyURL
+                if (msg.attachments.array().length > 1){
+                    let tempArr = [];
+                    for (i = 0; i < msg.attachments.array().length; i++){
+                        tempArr.push(msg.attachments.array()[i].proxyURL)
+                    }
+                    descriprion = `${msg.content}\n${tempArr.join('\n')}`
+                } else {
+                    descriprion = `${msg.content}\n${msg.attachments.array()[0].proxyURL}`
+                }
             } else {
-                title = `${msg.content}`
+                descriprion = `${msg.content}`
             }
 
-            let embedCreation = await embedGenerator(title, subtitle, footer, avatar)
+            let embedCreation = await deletionGenerator(descriprion, subtitle, footer, avatar)
             channel.send(embedCreation);
         }
     })
@@ -254,13 +262,13 @@ client.on("messageUpdate", function (oldMessage, newMessage) {
     connection.query("SELECT * FROM `messages_logs` WHERE `serverid` = ?", [newMessage.guild.id], async function (err, isEnabled, f) {
         if ((isEnabled.length == 1) && (newMessage.author.id != '823948446758338572') && (newMessage.author.bot == false) && (newMessage.content != oldMessage.content)) {
             let channel = client.channels.cache.get(isEnabled[0].logschannel)
-            let title = `Before: ${oldMessage.content}\nAfter: ${newMessage.content}`;
+            let descriprion = `Before: ${oldMessage.content}\nAfter: ${newMessage.content}`;
             let subtitle = `${newMessage.author.username}#${newMessage.author.discriminator} edited message in #${newMessage.channel.name}`
             let avatar = newMessage.author.avatarURL()
             let dateNow = new Date()
             let time = `${(dateNow.getHours()).toString().padStart(2, '0')}:${(dateNow.getMinutes()).toString().padStart(2, '0')}:${(dateNow.getSeconds()).toString().padStart(2, '0')}`
             let footer = `User ID:${newMessage.author.id} • Today at: ${time}`
-            let embedCreation = await embedGenerator(title, subtitle, footer, avatar)
+            let embedCreation = await deletionGenerator(descriprion, subtitle, footer, avatar)
             channel.send(embedCreation);
         }
     })
@@ -275,13 +283,12 @@ client.on("guildMemberRemove", function (member) {
                 let dateNow = new Date();
                 let wasOnServer = moment.unix(datejoined).fromNow();
                 let userRolesLeft = JSON.parse(userInfo[0].roles)
-                let title = `Joined: ${wasOnServer}`;
-                let desc = `Roles: ${userRolesLeft.map(item => `<@&${item}>`).join(', ')}`
+                let desc = `${member.user} Joined: ${wasOnServer}\nRoles: ${userRolesLeft.map(item => `<@&${item}>`).join(', ')}`
                 let subtitle = `${member.user.username}#${member.user.discriminator} left the server.`
                 let avatar = member.user.avatarURL()
                 let time = `${(dateNow.getHours()).toString().padStart(2, '0')}:${(dateNow.getMinutes()).toString().padStart(2, '0')}:${(dateNow.getSeconds()).toString().padStart(2, '0')}`
                 let footer = `User ID:${member.user.id} • Today at: ${time}`
-                let embedCreation = await leaveEmbedGenerator(title, subtitle, footer, avatar, desc)
+                let embedCreation = await leaveEmbedGenerator(subtitle, footer, avatar, desc)
                 channel.send(embedCreation);
             })
         }
@@ -331,10 +338,18 @@ function embedGenerator(title, subtitle, footer, avatar) {
     return embed;
 }
 
-function leaveEmbedGenerator(title, subtitle, footer, avatar, desc) {
+function deletionGenerator(descriprion, subtitle, footer, avatar) {
     const embed = new Discord.MessageEmbed()
         .setColor("#ff9d5a")
-        .setTitle(`${title}`)
+        .setDescription(`${descriprion}`)
+        .setFooter(footer)
+        .setAuthor(subtitle, avatar);
+    return embed;
+}
+
+function leaveEmbedGenerator(subtitle, footer, avatar, desc) {
+    const embed = new Discord.MessageEmbed()
+        .setColor("#ff9d5a")
         .setDescription(desc)
         .setFooter(footer)
         .setAuthor(subtitle, avatar);
@@ -343,10 +358,9 @@ function leaveEmbedGenerator(title, subtitle, footer, avatar, desc) {
 
 function updateRoles(newMember) {
     connection.query("SELECT * FROM `user_info` WHERE `userid` = ? AND `serverid` = ?", [newMember.user.id, newMember.guild.id], async function (err, userInfo, f) {
-        console.log(err)
         if (userInfo.length == 1) {
             let newRoles = JSON.stringify(newMember._roles)
             connection.query("UPDATE `user_info` SET `roles` = ? WHERE `user_info`.`id` = ?;", [newRoles, userInfo[0].id], async function (error, res_upd, f) { console.log(error) })
-        } else console.log(userInfo.length)
+        }
     })
 }
