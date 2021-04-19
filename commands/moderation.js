@@ -186,6 +186,28 @@ var commands = {
                 }
             })
         }
+    },
+    checkuser: async function (msg) {
+        const mention = msg.mentions.users.first();
+        if (!mention) {
+            return msg.reply("Please, specify the user!");
+        }
+
+        let perms = msg.channel.permissionsFor(msg.member);
+        if (perms.has('MANAGE_MESSAGES') || perms.has('KICK_MEMBERS') || perms.has('BAN_MEMBERS') || perms.has('MANAGE_ROLES')) {
+            let dateNow = new Date();
+            let time = `${(dateNow.getHours()).toString().padStart(2, '0')}:${(dateNow.getMinutes()).toString().padStart(2, '0')}:${(dateNow.getSeconds()).toString().padStart(2, '0')}`
+            let subtitle = `${mention.username}#${mention.discriminator} info.`
+            let avatar = mention.avatarURL()
+            let footer = `User ID: ${msg.author.id} • Today at: ${time}`
+            connection.query("SELECT * FROM `user_info` WHERE `userid` = ? AND `serverid` = ?", [mention.id, msg.guild.id], async function (err, userInfo, f) {
+
+
+            let embedCreation = await userInfoGenerator(subtitle, msg, mention, userInfo, avatar, footer)
+            msg.channel.send(embedCreation);
+
+            })
+        }
     }
 }
 
@@ -197,6 +219,26 @@ function embedGenerator(title, image, subtitle) {
         .setFooter(`KitsuneTheBot v0.0.1`)
         .setAuthor(subtitle);
     return embed;
+}
+
+function userInfoGenerator(subtitle, msg, mention, userInfo, avatar, footer) {
+
+    let userRoles = JSON.parse(userInfo[0].roles)
+    let dateJoined = new Date(userInfo[0].joinTimestamp * 1000)
+    let timeJoined = `Date (DD/MM/YY): ${(dateJoined.getDate()).toString().padStart(2, '0')}/${(dateJoined.getMonth()).toString().padStart(2, '0')}/${(dateJoined.getFullYear()).toString()} Time: ${(dateJoined.getHours()).toString().padStart(2, '0')}:${(dateJoined.getMinutes()).toString().padStart(2, '0')}:${(dateJoined.getSeconds()).toString().padStart(2, '0')} UTC`
+    const embed = new Discord.MessageEmbed()
+        .setColor("#ff9d5a")
+        .setTitle('Avatar')
+	    .setURL(avatar)
+        .addFields(
+            { name: 'Roles', value: `${userRoles.map(item => `<@&${item}>`).join(', ')}`, inline: true },
+            { name: 'Created at', value: `${mention.createdAt}`, inline: true },
+            { name: 'Joined at', value: `${timeJoined}`, inline: true },
+        )
+        .setFooter(footer)
+        .setAuthor(subtitle, avatar);
+    return embed;
+
 }
 
 function timeout(msg, mutedUser, role, unmute_time, roles_before, user_id, serverId) {

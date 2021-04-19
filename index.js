@@ -180,6 +180,22 @@ client.on('message', async msg => {
     if (msg.content.toLowerCase().startsWith('k!changeleave')) {
         logs.commands['changeleave'](msg)
     }
+
+    if (msg.content.toLowerCase().startsWith('k!enablejoin')) {
+        logs.commands['enablejoin'](msg)
+    }
+
+    if (msg.content.toLowerCase().startsWith('k!disablejoin')) {
+        logs.commands['disablejoin'](msg)
+    }
+
+    if (msg.content.toLowerCase().startsWith('k!changejoin')) {
+        logs.commands['changejoin'](msg)
+    }
+
+    if (msg.content.toLowerCase().startsWith('k!checkuser')) {
+        moderation.commands['checkuser'](msg)
+    }
 });
 
 client.on("guildCreate", async function (guild) {
@@ -308,6 +324,23 @@ client.on("guildMemberAdd", function (member) {
             // member.roles.add(userInfo[0].roles).catch(console.error);
         }
     })
+
+
+    connection.query("SELECT * FROM `join_logs` WHERE `serverid` = ?", [member.guild.id], async function (err, areLogsEnabled, f) {
+        if (areLogsEnabled.length == 1){
+            let channel = client.channels.cache.get(areLogsEnabled[0].logschannel)
+            let dateNow = new Date();
+            let time = `${(dateNow.getHours()).toString().padStart(2, '0')}:${(dateNow.getMinutes()).toString().padStart(2, '0')}:${(dateNow.getSeconds()).toString().padStart(2, '0')}`
+            let subtitle = `${member.user.username}#${member.user.discriminator} joined the server.`
+            let avatar = member.user.avatarURL()
+            let footer = `User ID:${member.user.id} • Today at: ${time}`
+            let desc = `Created at ${member.user.createdAt}`
+            let embedCreation = await joinEmbedGenerator(subtitle, footer, avatar, desc)
+            channel.send(embedCreation);
+        }
+    })
+
+
 });
 
 
@@ -356,11 +389,20 @@ function leaveEmbedGenerator(subtitle, footer, avatar, desc) {
     return embed;
 }
 
+function joinEmbedGenerator(subtitle, footer, avatar, desc) {
+    const embed = new Discord.MessageEmbed()
+        .setColor("#ff9d5a")
+        .setDescription(desc)
+        .setFooter(footer)
+        .setAuthor(subtitle, avatar);
+    return embed;
+}
+
 function updateRoles(newMember) {
     connection.query("SELECT * FROM `user_info` WHERE `userid` = ? AND `serverid` = ?", [newMember.user.id, newMember.guild.id], async function (err, userInfo, f) {
         if (userInfo.length == 1) {
             let newRoles = JSON.stringify(newMember._roles)
-            connection.query("UPDATE `user_info` SET `roles` = ? WHERE `user_info`.`id` = ?;", [newRoles, userInfo[0].id], async function (error, res_upd, f) { console.log(error) })
+            connection.query("UPDATE `user_info` SET `roles` = ? WHERE `user_info`.`id` = ?;", [newRoles, userInfo[0].id], async function (error, res_upd, f) {  })
         }
     })
 }
