@@ -101,9 +101,9 @@ client.on('message', async msg => {
                 },
                 {
                     name: "Other Commands",
-                    value: 
-                    "**k!welcome help** - Guide for setting up welcome message\n" +
-                    "**k!help** - Show help\n",
+                    value:
+                        "**k!welcome help** - Guide for setting up welcome message\n" +
+                        "**k!help** - Show help\n",
                 }
             )
             .setFooter(`KitsuneTheBot v0.0.1`)
@@ -372,7 +372,7 @@ client.on("guildMemberAdd", function (member) {
             let embedCreation = await welcomeEmbedGenerator(title, image, desc)
             channel.send(`${member.user} has joined the server!`, {
                 embed: embedCreation,
-               });
+            });
         }
     })
 

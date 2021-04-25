@@ -203,8 +203,8 @@ var commands = {
             connection.query("SELECT * FROM `user_info` WHERE `userid` = ? AND `serverid` = ?", [mention.id, msg.guild.id], async function (err, userInfo, f) {
 
 
-            let embedCreation = await userInfoGenerator(subtitle, msg, mention, userInfo, avatar, footer)
-            msg.channel.send(embedCreation);
+                let embedCreation = await userInfoGenerator(subtitle, msg, mention, userInfo, avatar, footer)
+                msg.channel.send(embedCreation);
 
             })
         }
@@ -229,7 +229,7 @@ function userInfoGenerator(subtitle, msg, mention, userInfo, avatar, footer) {
     const embed = new Discord.MessageEmbed()
         .setColor("#ff9d5a")
         .setTitle('Avatar')
-	    .setURL(avatar)
+        .setURL(avatar)
         .addFields(
             { name: 'Roles', value: `${userRoles.map(item => `<@&${item}>`).join(', ')}`, inline: true },
             { name: 'Created at', value: `${mention.createdAt}`, inline: true },

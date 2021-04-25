@@ -147,35 +147,35 @@ var options = {
     },
     help: async function (msg) {
         const embed = new Discord.MessageEmbed()
-        .setTitle("How to use k!welcome")
-        .setDescription("Hey there, I'm KitsuneTheBot and I'm here to tell you about k!welcome function!")
-        .addFields(
-            {
-                name: "How to setup it?",
-                value:
-                    "Using this command is actually not that hard.\nIf you want to enable welcome message, use:\n\n" +
-                    "**k!welcome enable** - This command will make bot send welcome message in channel where it was used\n",
-            },
-            {
-                name: "How do I change text and image?",
-                value:
-                    "**k!welcome setimage `url`** - Set your own image or gif!\n" +
-                    "**k!welcome settext `text`** - Set your own text into welcome message!\n",
-            },
-            {
-                name: "How do I change channel for those greetings?",
-                value:
-                    "**k!welcome changechannel** - Change channel for welcome message!\n",
-            },
-            {
-                name: "How do I disable it?",
-                value: 
-                "**k!welcome disable** - Disable welcome message!\n",
-            }
-        )
-        .setFooter(`KitsuneTheBot v0.0.1`)
-        .setColor("#ff9d5a");
-    return msg.channel.send(embed);
+            .setTitle("How to use k!welcome")
+            .setDescription("Hey there, I'm KitsuneTheBot and I'm here to tell you about k!welcome function!")
+            .addFields(
+                {
+                    name: "How to setup it?",
+                    value:
+                        "Using this command is actually not that hard.\nIf you want to enable welcome message, use:\n\n" +
+                        "**k!welcome enable** - This command will make bot send welcome message in channel where it was used\n",
+                },
+                {
+                    name: "How do I change text and image?",
+                    value:
+                        "**k!welcome setimage `url`** - Set your own image or gif!\n" +
+                        "**k!welcome settext `text`** - Set your own text into welcome message!\n",
+                },
+                {
+                    name: "How do I change channel for those greetings?",
+                    value:
+                        "**k!welcome changechannel** - Change channel for welcome message!\n",
+                },
+                {
+                    name: "How do I disable it?",
+                    value:
+                        "**k!welcome disable** - Disable welcome message!\n",
+                }
+            )
+            .setFooter(`KitsuneTheBot v0.0.1`)
+            .setColor("#ff9d5a");
+        return msg.channel.send(embed);
     }
 }
 
