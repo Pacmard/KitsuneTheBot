@@ -6,6 +6,7 @@ var mysql = require('mysql');
 var image = require('./commands/image.js')
 var moderation = require('./commands/moderation.js')
 var logs = require('./commands/logs.js')
+var welcome = require('./commands/welcome.js')
 const { prefix, token, mysql_user, mysql_passwd, mysql_db } = require('./config.json');
 
 
@@ -196,6 +197,24 @@ client.on('message', async msg => {
     if (msg.content.toLowerCase().startsWith('k!checkuser')) {
         moderation.commands['checkuser'](msg)
     }
+
+    if (msg.content.toLowerCase().startsWith('k!welcome')) {
+        let perms = msg.channel.permissionsFor(msg.member);
+        if (perms.has('ADMINISTRATOR')) {
+            let options = ['enable', 'changechannel', 'disable', 'setimage', 'settext']
+            message = msg.content;
+            test = message.replace('k!welcome ', '').split(' ');
+            setting = test.shift()
+            message = test.join(' ').replace(setting, '');
+            if (options.includes(setting)) {
+                // if (levels.includes(level)) {
+                welcome.options[setting](msg)
+                // } else data.reply('Укажите уровень прав, который необходимо установить команде! Список уровней прав и их триггеры можете получить при помощи команды !levels') TODO
+            } else {
+                // msg.reply('Укажите команду для которой надо настроить права, список команд и их триггеры можете получить используя команду !triggers') TODO
+            }
+        }
+    }
 });
 
 client.on("guildCreate", async function (guild) {
@@ -253,9 +272,9 @@ client.on("messageDelete", function (msg) {
             let footer = `User ID:${msg.author.id} • Today at: ${time}`
 
             if (msg.attachments.array().length >= 1) {
-                if (msg.attachments.array().length > 1){
+                if (msg.attachments.array().length > 1) {
                     let tempArr = [];
-                    for (i = 0; i < msg.attachments.array().length; i++){
+                    for (i = 0; i < msg.attachments.array().length; i++) {
                         tempArr.push(msg.attachments.array()[i].proxyURL)
                     }
                     descriprion = `${msg.content}\n${tempArr.join('\n')}`
@@ -327,7 +346,7 @@ client.on("guildMemberAdd", function (member) {
 
 
     connection.query("SELECT * FROM `join_logs` WHERE `serverid` = ?", [member.guild.id], async function (err, areLogsEnabled, f) {
-        if (areLogsEnabled.length == 1){
+        if (areLogsEnabled.length == 1) {
             let channel = client.channels.cache.get(areLogsEnabled[0].logschannel)
             let dateNow = new Date();
             let time = `${(dateNow.getHours()).toString().padStart(2, '0')}:${(dateNow.getMinutes()).toString().padStart(2, '0')}:${(dateNow.getSeconds()).toString().padStart(2, '0')}`
@@ -340,6 +359,17 @@ client.on("guildMemberAdd", function (member) {
         }
     })
 
+
+    connection.query("SELECT * FROM `welcome_msg` WHERE `serverid` = ?", [member.guild.id], async function (err, isWelcomingEnabled, f) {
+        if (isWelcomingEnabled.length == 1) {
+            let channel = client.channels.cache.get(isWelcomingEnabled[0].welcomechannel)
+            let title = `Welcome to the ${member.guild.name} server!`
+            let desc = `${isWelcomingEnabled[0].text}`
+            let image = `${isWelcomingEnabled[0].image}`
+            let embedCreation = await welcomeEmbedGenerator(title, image, desc)
+            channel.send(embedCreation);
+        }
+    })
 
 });
 
@@ -398,11 +428,20 @@ function joinEmbedGenerator(subtitle, footer, avatar, desc) {
     return embed;
 }
 
+function welcomeEmbedGenerator(title, image, desc) {
+    const embed = new Discord.MessageEmbed()
+        .setColor("#ff9d5a")
+        .setTitle(`${title}`)
+        .setImage(image)
+        .setDescription(desc)
+    return embed;
+}
+
 function updateRoles(newMember) {
     connection.query("SELECT * FROM `user_info` WHERE `userid` = ? AND `serverid` = ?", [newMember.user.id, newMember.guild.id], async function (err, userInfo, f) {
         if (userInfo.length == 1) {
             let newRoles = JSON.stringify(newMember._roles)
-            connection.query("UPDATE `user_info` SET `roles` = ? WHERE `user_info`.`id` = ?;", [newRoles, userInfo[0].id], async function (error, res_upd, f) {  })
+            connection.query("UPDATE `user_info` SET `roles` = ? WHERE `user_info`.`id` = ?;", [newRoles, userInfo[0].id], async function (error, res_upd, f) { })
         }
     })
 }
