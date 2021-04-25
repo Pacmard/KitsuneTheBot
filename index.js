@@ -94,11 +94,16 @@ client.on('message', async msg => {
                         "**k!changelogs** - Change channel for message actions logs!\n\n" +
                         "**k!enableleave** - Enable server leave logging!\n" +
                         "**k!disableleave** - Disable server leave logging!\n" +
-                        "**k!changeleave** - Change channel for server leave logs!\n",
+                        "**k!changeleave** - Change channel for server leave logs!\n\n" +
+                        "**k!enablejoin** - Enable server join logging!\n" +
+                        "**k!disablejoin** - Disable server join logging!\n" +
+                        "**k!changejoin** - Change channel for server join logs!\n",
                 },
                 {
                     name: "Other Commands",
-                    value: "**k!help** - Show help\n",
+                    value: 
+                    "**k!welcome help** - Guide for setting up welcome message\n" +
+                    "**k!help** - Show help\n",
                 }
             )
             .setFooter(`KitsuneTheBot v0.0.1`)
@@ -201,15 +206,13 @@ client.on('message', async msg => {
     if (msg.content.toLowerCase().startsWith('k!welcome')) {
         let perms = msg.channel.permissionsFor(msg.member);
         if (perms.has('ADMINISTRATOR')) {
-            let options = ['enable', 'changechannel', 'disable', 'setimage', 'settext']
+            let options = ['enable', 'changechannel', 'disable', 'setimage', 'settext', 'help']
             message = msg.content;
             test = message.replace('k!welcome ', '').split(' ');
             setting = test.shift()
             message = test.join(' ').replace(setting, '');
             if (options.includes(setting)) {
-                // if (levels.includes(level)) {
                 welcome.options[setting](msg)
-                // } else data.reply('Укажите уровень прав, который необходимо установить команде! Список уровней прав и их триггеры можете получить при помощи команды !levels') TODO
             } else {
                 // msg.reply('Укажите команду для которой надо настроить права, список команд и их триггеры можете получить используя команду !triggers') TODO
             }
@@ -367,7 +370,9 @@ client.on("guildMemberAdd", function (member) {
             let desc = `${isWelcomingEnabled[0].text}`
             let image = `${isWelcomingEnabled[0].image}`
             let embedCreation = await welcomeEmbedGenerator(title, image, desc)
-            channel.send(embedCreation);
+            channel.send(`${member.user} has joined the server!`, {
+                embed: embedCreation,
+               });
         }
     })
 
