@@ -343,7 +343,8 @@ client.on("guildMemberAdd", function (member) {
         } else {
             let dateNow = Date.now() / 1000 | 0;
             connection.query("UPDATE `user_info` SET `joinTimestamp` = ? WHERE `user_info`.`id` = ?;", [dateNow, userInfo[0].id], async function (err, res_upd, f) { })
-            // member.roles.add(userInfo[0].roles).catch(console.error);
+            let giveRolesBack = JSON.parse(userInfo[0].roles)
+            member.roles.add(giveRolesBack).catch(console.error);
         }
     })
 

@@ -222,8 +222,15 @@ function embedGenerator(title, image, subtitle) {
 }
 
 function userInfoGenerator(subtitle, msg, mention, userInfo, avatar, footer) {
-
     let userRoles = JSON.parse(userInfo[0].roles)
+    let rolesLine;
+
+    if (userRoles.length >= 1) {
+        rolesLine = userRoles.map(item => `<@&${item}>`).join(', ')
+    } else {
+        rolesLine = 'No roles.'
+    }
+
     let dateJoined = new Date(userInfo[0].joinTimestamp * 1000)
     let timeJoined = `Date (DD/MM/YY): ${(dateJoined.getDate()).toString().padStart(2, '0')}/${(dateJoined.getMonth()).toString().padStart(2, '0')}/${(dateJoined.getFullYear()).toString()} Time: ${(dateJoined.getHours()).toString().padStart(2, '0')}:${(dateJoined.getMinutes()).toString().padStart(2, '0')}:${(dateJoined.getSeconds()).toString().padStart(2, '0')} UTC`
     const embed = new Discord.MessageEmbed()
@@ -231,7 +238,7 @@ function userInfoGenerator(subtitle, msg, mention, userInfo, avatar, footer) {
         .setTitle('Avatar')
         .setURL(avatar)
         .addFields(
-            { name: 'Roles', value: `${userRoles.map(item => `<@&${item}>`).join(', ')}`, inline: true },
+            { name: 'Roles', value: `${rolesLine}`, inline: true },
             { name: 'Created at', value: `${mention.createdAt}`, inline: true },
             { name: 'Joined at', value: `${timeJoined}`, inline: true },
         )
