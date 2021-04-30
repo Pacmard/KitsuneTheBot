@@ -8,6 +8,8 @@ It can:
 - Send custom welcome messages
 - Help moderators punish violators
 - Pat, cuddle, hug, kiss, slap, tickle, bite and fluff someones tail!
+
+
 - You can see full list of commands after inviting bot to your server and using k!help command
 
 Questions? Contact support@kitsune.su
