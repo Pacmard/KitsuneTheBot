@@ -29,9 +29,9 @@ var commands = {
         }
 
         let perms = msg.channel.permissionsFor(msg.member);
-
+        let bannedPerms = msg.channel.permissionsFor(mention);
         if (perms.has('BAN_MEMBERS')) {
-
+            if (!(bannedPerms.has('BAN_MEMBERS') || bannedPerms.has('ADMINISTRATOR') || bannedPerms.has('KICK_MEMBERS') || bannedPerms.has('MANAGE_ROLES'))) {
             removingCmdsVars = msg.content.replace(`k!ban`, ``).replace(/<@!?\d+>/, ``)
             params = removingCmdsVars.trimStart().replace(/ +(?= )/g, '');
             paramsSplit = params.split(' ')
@@ -46,11 +46,12 @@ var commands = {
 
             bannedUser.ban({ reason: banReason })
 
-            const image = `https://media1.tenor.com/images/2dfc019556073683716852b293959706/tenor.gif?itemid=17040749`
+            const image = `https://cdn.discordapp.com/attachments/816937791173689356/836500563075661854/rickban.gif`
             let title = `Get banned, ${mention.username}#${mention.discriminator}!`
             let subtitle = `${msg.author.username} bans ${mention.username}`
             let embedCreation = await embedGenerator(title, image, subtitle)
             return msg.channel.send(embedCreation);
+        }
         } else {
             msg.reply(`You don't have permissions to ban people!`)
         }
@@ -251,7 +252,7 @@ function userInfoGenerator(subtitle, msg, mention, userInfo, avatar, footer) {
 function timeout(msg, mutedUser, role, unmute_time, roles_before, user_id, serverId) {
     let time_timeout = unmute_time * 1000
     setTimeout(() => {
-        connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `is_unmuted` = ?", [user_id, serverId, unmute_time, 0], async function (err, isMuted, f) {
+        connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `is_unmuted` = ?", [user_id, serverId, 0], async function (err, isMuted, f) {
             if (isMuted.length == 1) {
                 await connection.query("UPDATE `mute` SET `is_unmuted` = ? WHERE `mute`.`id` = ?;", [1, isMuted[0].id], async function (err, res_upd, f) {
                     await mutedUser.roles.add(roles_before).catch(console.error);

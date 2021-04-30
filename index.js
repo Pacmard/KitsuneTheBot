@@ -76,6 +76,7 @@ client.on('message', async msg => {
                         "**k!slap @mention** - Slap slap, how dare you!\n" +
                         "**k!tickle @mention** - Tickle someone, and they can tickle you too\n" +
                         "**k!lick @mention** - Lick them all!\n" +
+                        "**k!fluff @mention** - What a fluffy tail!\n" +
                         "**k!bite @mention** - When lick is not enough!\n",
                 },
                 {
