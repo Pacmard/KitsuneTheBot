@@ -1,5 +1,5 @@
-##Convenient, compact and friendly KitsuneTheBot!
-###Ready to identify potential violators, mute violators, and even block them very quickly and easily!
+## Convenient, compact and friendly KitsuneTheBot!
+### Ready to identify potential violators, mute violators, and even block them very quickly and easily!
 
 It can:
 
