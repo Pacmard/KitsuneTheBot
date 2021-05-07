@@ -78,7 +78,7 @@ client.on('message', async msg => {
                         "**k!lick @mention** - Lick them all!\n" +
                         "**k!fluff @mention** - What a fluffy tail!\n" +
                         "**k!bite @mention** - When lick is not enough!\n" + 
-                        "**k!senko** - When you need your dose of senko!\n",
+                        "**k!senko** - When you need your dose of Senko!\n",
                 },
                 {
                     name: "Mod commands",
