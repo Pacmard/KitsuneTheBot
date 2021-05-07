@@ -100,7 +100,7 @@ var commands = {
             connection.query("SELECT * FROM `mute` WHERE `userid` = ? AND `server_id` = ? AND `unmute_time` >= ? AND `is_unmuted` = ?", [mention.id, serverId, dateNow, 0], async function (err, isMuted, f) {
                 if (isMuted.length == 0) {
 
-                    removingCmdsVars = msg.content.replace(`k!tempmute`, ``).replace(`<@!${mention.id}>`, ``).replace(`<@${mention.id}>`, ``);
+                    removingCmdsVars = msg.content.replace(`k!tempmute`, ``).replace(`k!mute`, ``).replace(`<@!${mention.id}>`, ``).replace(`<@${mention.id}>`, ``);
                     params = removingCmdsVars.trimStart().replace(/ +(?= )/g, '');
                     paramsSplit = params.split(' ');
 

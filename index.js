@@ -77,14 +77,15 @@ client.on('message', async msg => {
                         "**k!tickle @mention** - Tickle someone, and they can tickle you too\n" +
                         "**k!lick @mention** - Lick them all!\n" +
                         "**k!fluff @mention** - What a fluffy tail!\n" +
-                        "**k!bite @mention** - When lick is not enough!\n",
+                        "**k!bite @mention** - When lick is not enough!\n" + 
+                        "**k!senko** - When you need your dose of senko!\n",
                 },
                 {
                     name: "Mod commands",
                     value:
                         "**k!ban @mention `reason`** - Ban someone, rules are important!\n" +
                         "**k!kick @mention `reason`** - Kick someone, if you think he needs to get out!\n" +
-                        "**k!tempmute @mention `time` `reason`** - Don't let spammers do spam!\n*time in hours, should be less than 48.\n" +
+                        "**k!mute @mention `time` `reason`** - Don't let spammers do spam!\n*time in hours, should be less than 48. Alias: k!tempmute\n" +
                         "**k!unmute @mention** - If you need to let someone talk again!\n",
                 },
                 {
@@ -156,7 +157,7 @@ client.on('message', async msg => {
         moderation.commands['kick'](msg)
     }
 
-    if (msg.content.toLowerCase().startsWith('k!tempmute')) {
+    if (msg.content.toLowerCase().startsWith('k!tempmute') || msg.content.toLowerCase().startsWith('k!mute')) {
         moderation.commands['tempmute'](msg)
     }
 
