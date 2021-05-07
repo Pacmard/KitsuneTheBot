@@ -204,6 +204,14 @@ client.on('message', async msg => {
         moderation.commands['checkuser'](msg)
     }
 
+    if (msg.content.toLowerCase().startsWith('k!senko')) {
+        axios.request({
+            method: "GET",
+            url: "http://localhost:3000/senko",
+        });    
+        image.commands['senko'](msg)
+    }
+
     if (msg.content.toLowerCase().startsWith('k!welcome')) {
         let perms = msg.channel.permissionsFor(msg.member);
         if (perms.has('ADMINISTRATOR')) {

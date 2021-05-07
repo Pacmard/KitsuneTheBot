@@ -223,6 +223,20 @@ var commands = {
         let subtitle = `${msg.author.username} fluffs ${mention.username} tail!`
         let embedCreation = await embedGenerator(title, image, subtitle)
         return msg.channel.send(embedCreation);
+    },
+    senko: async function (msg) {
+
+        const response = await axios.request({
+            method: "GET",
+            url: "http://localhost:3000/senko",
+        });
+
+        const attachment = new Discord.MessageAttachment(`${response.data.path}`, `${response.data.image}`);
+        const image = `attachment://${response.data.image}`
+        let title = `Here, have some cute loli fox!`
+        let subtitle = `${msg.author.username} asks for Senko image!`
+        let embedCreation = await senkoGenerator(title, image, subtitle, attachment)
+        return msg.channel.send(embedCreation);
     }
 }
 
@@ -233,6 +247,17 @@ function embedGenerator(title, image, subtitle) {
         .setImage(image)
         .setFooter(`KitsuneTheBot v0.0.1`)
         .setAuthor(subtitle);
+    return embed;
+}
+
+function senkoGenerator(title, image, subtitle, attachment) {
+    const embed = new Discord.MessageEmbed()
+        .setColor("#ff9d5a")
+        .setTitle(title)
+        .setImage(image)
+        .setFooter(`KitsuneTheBot v0.0.1`)
+        .attachFiles(attachment)
+        .setAuthor(subtitle)
     return embed;
 }
 module.exports.commands = commands;
