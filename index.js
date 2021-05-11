@@ -77,7 +77,7 @@ client.on('message', async msg => {
                         "**k!tickle @mention** - Tickle someone, and they can tickle you too\n" +
                         "**k!lick @mention** - Lick them all!\n" +
                         "**k!fluff @mention** - What a fluffy tail!\n" +
-                        "**k!bite @mention** - When lick is not enough!\n" + 
+                        "**k!bite @mention** - When lick is not enough!\n" +
                         "**k!senko** - When you need your dose of Senko!\n",
                 },
                 {
@@ -206,11 +206,11 @@ client.on('message', async msg => {
     }
 
     if (msg.content.toLowerCase().startsWith('k!senko')) {
-        axios.request({
-            method: "GET",
-            url: "http://localhost:3000/senko",
-        });    
         image.commands['senko'](msg)
+    }
+
+    if (msg.content.toLowerCase().startsWith('k!bonk')) {
+        image.commands['bonk'](msg)
     }
 
     if (msg.content.toLowerCase().startsWith('k!welcome')) {

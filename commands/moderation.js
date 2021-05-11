@@ -32,26 +32,26 @@ var commands = {
         let bannedPerms = msg.channel.permissionsFor(mention);
         if (perms.has('BAN_MEMBERS')) {
             if (!(bannedPerms.has('BAN_MEMBERS') || bannedPerms.has('ADMINISTRATOR') || bannedPerms.has('KICK_MEMBERS') || bannedPerms.has('MANAGE_ROLES'))) {
-            removingCmdsVars = msg.content.replace(`k!ban`, ``).replace(/<@!?\d+>/, ``)
-            params = removingCmdsVars.trimStart().replace(/ +(?= )/g, '');
-            paramsSplit = params.split(' ')
-            let banReason;
-            let bannedUser = msg.guild.members.resolve(mention.id)
+                removingCmdsVars = msg.content.replace(`k!ban`, ``).replace(/<@!?\d+>/, ``)
+                params = removingCmdsVars.trimStart().replace(/ +(?= )/g, '');
+                paramsSplit = params.split(' ')
+                let banReason;
+                let bannedUser = msg.guild.members.resolve(mention.id)
 
-            if (params.length == 0) {
-                banReason = 'Not provided'
-            } else {
-                banReason = params[0]
+                if (params.length == 0) {
+                    banReason = 'Not provided'
+                } else {
+                    banReason = params[0]
+                }
+
+                await bannedUser.ban({ reason: banReason })
+
+                const image = `https://cdn.discordapp.com/attachments/816937791173689356/836500563075661854/rickban.gif`
+                let title = `Get banned, ${mention.username}#${mention.discriminator}!`
+                let subtitle = `${msg.author.username} bans ${mention.username}`
+                let embedCreation = await embedGenerator(title, image, subtitle)
+                return msg.channel.send(embedCreation);
             }
-
-            bannedUser.ban({ reason: banReason })
-
-            const image = `https://cdn.discordapp.com/attachments/816937791173689356/836500563075661854/rickban.gif`
-            let title = `Get banned, ${mention.username}#${mention.discriminator}!`
-            let subtitle = `${msg.author.username} bans ${mention.username}`
-            let embedCreation = await embedGenerator(title, image, subtitle)
-            return msg.channel.send(embedCreation);
-        }
         } else {
             msg.reply(`You don't have permissions to ban people!`)
         }
