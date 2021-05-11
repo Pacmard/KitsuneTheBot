@@ -2,18 +2,27 @@ const express = require('express')
 const app = express()
 const senkoFolder = './senko';
 const bonkFolder = './bonk';
+const waifuFolder = './waifu';
+const waifuSources = require('./sources/waifu.json')
+const senkoSources = require('./sources/senko.json')
 const fs = require('fs');
 let senkoFileList = [];
 let bonkFileList = [];
+let waifuFileList = [];
 
 app.get('/senko', async function (req, res) {
   let picNumber = Math.floor(Math.random() * 97)
-  res.json({ path: `./backend/senko/${senkoFileList[picNumber]}`, image: `${senkoFileList[picNumber]}` })
+  res.json({ path: `./backend/senko/${senkoFileList[picNumber]}`, image: `${senkoFileList[picNumber]}`, source: `${senkoSources[senkoFileList[picNumber]]}` })
 });
 
 app.get('/bonk', async function (req, res) {
   let picNumber = Math.floor(Math.random() * 19)
   res.json({ path: `./backend/bonk/${bonkFileList[picNumber]}`, image: `${bonkFileList[picNumber]}` })
+});
+
+app.get('/waifu', async function (req, res) {
+  let picNumber = Math.floor(Math.random() * 62)
+  res.json({ path: `./backend/waifu/${waifuFileList[picNumber]}`, image: `${waifuFileList[picNumber]}`, source: `${waifuSources[waifuFileList[picNumber]]}` })
 });
 
 app.get('/lick', async function (req, res) {
@@ -75,6 +84,10 @@ fs.readdirSync(senkoFolder).forEach(file => {
 
 fs.readdirSync(bonkFolder).forEach(file => {
   bonkFileList.push(file)
+});
+
+fs.readdirSync(waifuFolder).forEach(file => {
+  waifuFileList.push(file)
 });
 
 app.listen(3000)

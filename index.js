@@ -78,6 +78,7 @@ client.on('message', async msg => {
                         "**k!lick @mention** - Lick them all!\n" +
                         "**k!fluff @mention** - What a fluffy tail!\n" +
                         "**k!bite @mention** - When lick is not enough!\n" +
+                        "**k!bonk @mention** - Bonk them all!\n" +
                         "**k!senko** - When you need your dose of Senko!\n",
                 },
                 {
@@ -211,6 +212,10 @@ client.on('message', async msg => {
 
     if (msg.content.toLowerCase().startsWith('k!bonk')) {
         image.commands['bonk'](msg)
+    }
+
+    if (msg.content.toLowerCase().startsWith('k!waifu')) {
+        image.commands['waifu'](msg)
     }
 
     if (msg.content.toLowerCase().startsWith('k!welcome')) {

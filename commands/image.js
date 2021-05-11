@@ -209,7 +209,8 @@ var commands = {
         const image = `attachment://${response.data.image}`
         let title = `Here, have some cute loli fox!`
         let subtitle = `${msg.author.username} asks for Senko image!`
-        let embedCreation = await senkoGenerator(title, image, subtitle, attachment)
+        let footer = `Art source: ${response.data.source}\nKitsuneTheBot v0.0.1`
+        let embedCreation = await senkoGenerator(title, image, subtitle, attachment, footer)
         return msg.channel.send(embedCreation);
     },
     bonk: async function (msg) {
@@ -232,9 +233,24 @@ var commands = {
         const image = `attachment://${response.data.image}`
         let title = `Hey! ${mention.username}! You'll get bonked!`
         let subtitle = `${msg.author.username} bonks ${mention.username}!`
-        let embedCreation = await senkoGenerator(title, image, subtitle, attachment)
+        let embedCreation = await bonkGenerator(title, image, subtitle, attachment)
         return msg.channel.send(embedCreation);
-    }
+    },
+    waifu: async function (msg) {
+
+        const response = await axios.request({
+            method: "GET",
+            url: "http://localhost:3000/waifu",
+        });
+
+        const attachment = new Discord.MessageAttachment(`${response.data.path}`, `${response.data.image}`);
+        const image = `attachment://${response.data.image}`
+        let title = `Here, have a pic of cute anime girl!`
+        let subtitle = `${msg.author.username} asks for some good art!`
+        let footer = `Art source: ${response.data.source}\nKitsuneTheBot v0.0.1`
+        let embedCreation = await senkoGenerator(title, image, subtitle, attachment, footer)
+        return msg.channel.send(embedCreation);
+    },
 }
 
 function embedGenerator(title, image, subtitle) {
@@ -247,7 +263,18 @@ function embedGenerator(title, image, subtitle) {
     return embed;
 }
 
-function senkoGenerator(title, image, subtitle, attachment) {
+function senkoGenerator(title, image, subtitle, attachment, footer) {
+    const embed = new Discord.MessageEmbed()
+        .setColor("#ff9d5a")
+        .setTitle(title)
+        .setImage(image)
+        .setFooter(footer)
+        .attachFiles(attachment)
+        .setAuthor(subtitle)
+    return embed;
+}
+
+function bonkGenerator(title, image, subtitle, attachment) {
     const embed = new Discord.MessageEmbed()
         .setColor("#ff9d5a")
         .setTitle(title)
@@ -257,4 +284,5 @@ function senkoGenerator(title, image, subtitle, attachment) {
         .setAuthor(subtitle)
     return embed;
 }
+
 module.exports.commands = commands;
