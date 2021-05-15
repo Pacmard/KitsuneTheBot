@@ -21,7 +21,7 @@ app.get('/bonk', async function (req, res) {
 });
 
 app.get('/waifu', async function (req, res) {
-  let picNumber = Math.floor(Math.random() * 62)
+  let picNumber = Math.floor(Math.random() * 112)
   res.json({ path: `./backend/waifu/${waifuFileList[picNumber]}`, image: `${waifuFileList[picNumber]}`, source: `${waifuSources[waifuFileList[picNumber]]}` })
 });
 
