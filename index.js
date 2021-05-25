@@ -61,175 +61,214 @@ client.on('ready', async () => {
 });
 
 client.on('message', async msg => {
-    if (msg.content.toLowerCase().startsWith('k!help')) {
-        const embed = new Discord.MessageEmbed()
-            .setTitle("Help")
-            .setDescription("Hey there, I'm KitsuneTheBot and I'm here to pamper you!")
-            .addFields(
-                {
-                    name: "Image Commands",
-                    value:
-                        "**k!pat @mention** - Pat someone, everyone likes pats ^_^\n" +
-                        "**k!cuddle @mention** - Cuddle, how cute. uwu\n" +
-                        "**k!hug @mention** - Friendly hug from a friend. owo\n" +
-                        "**k!kiss @mention** - Just a cute kiss\n" +
-                        "**k!slap @mention** - Slap slap, how dare you!\n" +
-                        "**k!tickle @mention** - Tickle someone, and they can tickle you too\n" +
-                        "**k!lick @mention** - Lick them all!\n" +
-                        "**k!fluff @mention** - What a fluffy tail!\n" +
-                        "**k!bite @mention** - When lick is not enough!\n" +
-                        "**k!bonk @mention** - Bonk them all!\n" +
-                        "**k!senko** - When you need your dose of Senko!\n",
-                },
-                {
-                    name: "Mod commands",
-                    value:
-                        "**k!ban @mention `reason`** - Ban someone, rules are important!\n" +
-                        "**k!kick @mention `reason`** - Kick someone, if you think he needs to get out!\n" +
-                        "**k!mute @mention `time` `reason`** - Don't let spammers do spam!\n*time in hours, should be less than 48. Alias: k!tempmute\n" +
-                        "**k!unmute @mention** - If you need to let someone talk again!\n",
-                },
-                {
-                    name: "Logs commands",
-                    value:
-                        "**k!enablelogs** - Enable message actions logging!\n" +
-                        "**k!disablelogs** - Disable message actions logging!\n" +
-                        "**k!changelogs** - Change channel for message actions logs!\n\n" +
-                        "**k!enableleave** - Enable server leave logging!\n" +
-                        "**k!disableleave** - Disable server leave logging!\n" +
-                        "**k!changeleave** - Change channel for server leave logs!\n\n" +
-                        "**k!enablejoin** - Enable server join logging!\n" +
-                        "**k!disablejoin** - Disable server join logging!\n" +
-                        "**k!changejoin** - Change channel for server join logs!\n",
-                },
-                {
-                    name: "Other Commands",
-                    value:
-                        "**k!welcome help** - Guide for setting up welcome message\n" +
-                        "**k!help** - Show help\n",
+    if (msg.content.toLowerCase().startsWith('k!')) {
+        switch (true) {
+            case msg.content.toLowerCase().startsWith('k!cuddle'): {
+                image.commands['cuddle'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!pat'): {
+                image.commands['pat'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!kiss'): {
+                image.commands['kiss'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!slap'): {
+                image.commands['slap'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!hug'): {
+                image.commands['hug'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!tickle'): {
+                image.commands['tickle'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!lick'): {
+                image.commands['lick'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!bite'): {
+                image.commands['bite'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!fluff'): {
+                image.commands['fluff'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!ban'): {
+                moderation.commands['ban'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!kick'): {
+                moderation.commands['kick'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!tempmute'):
+            case msg.content.toLowerCase().startsWith('k!mute'): {
+                moderation.commands['tempmute'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!unmute'): {
+                moderation.commands['unmute'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!enablelogs'): {
+                logs.commands['enablelogs'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!changelogs'): {
+                logs.commands['changelogs'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!disablelogs'): {
+                logs.commands['disablelogs'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!enableleave'): {
+                logs.commands['enableleave'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!disableleave'): {
+                logs.commands['disableleave'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!changeleave'): {
+                logs.commands['changeleave'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!enablejoin'): {
+                logs.commands['enablejoin'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!disablejoin'): {
+                logs.commands['disablejoin'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!changejoin'): {
+                logs.commands['changejoin'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!checkuser'): {
+                moderation.commands['checkuser'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!senko'): {
+                image.commands['senko'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!bonk'): {
+                image.commands['bonk'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!waifu'): {
+                image.commands['waifu'](msg)
+                break;
+            }
+
+            case msg.content.toLowerCase().startsWith('k!welcome'): {
+                let perms = msg.channel.permissionsFor(msg.member);
+                if (perms.has('ADMINISTRATOR')) {
+                    let options = ['enable', 'changechannel', 'disable', 'setimage', 'settext', 'help']
+                    message = msg.content;
+                    test = message.replace('k!welcome ', '').split(' ');
+                    setting = test.shift()
+                    message = test.join(' ').replace(setting, '');
+                    if (options.includes(setting)) {
+                        welcome.options[setting](msg)
+                    } else {
+                        // msg.reply('Укажите команду для которой надо настроить права, список команд и их триггеры можете получить используя команду !triggers') TODO
+                    }
                 }
-            )
-            .setFooter(`KitsuneTheBot v0.0.1`)
-            .setColor("#ff9d5a");
-        msg.channel.send(embed);
-    }
+                break;
+            }
 
-    if (msg.content.toLowerCase().startsWith('k!cuddle')) {
-        image.commands['cuddle'](msg)
-    }
+            case msg.content.toLowerCase().startsWith('k!help'): {
+                const embed = new Discord.MessageEmbed()
+                    .setTitle("Help")
+                    .setDescription("Hey there, I'm KitsuneTheBot and I'm here to pamper you!")
+                    .addFields(
+                        {
+                            name: "Image Commands",
+                            value:
+                                "**k!pat @mention** - Pat someone, everyone likes pats ^_^\n" +
+                                "**k!cuddle @mention** - Cuddle, how cute. uwu\n" +
+                                "**k!hug @mention** - Friendly hug from a friend. owo\n" +
+                                "**k!kiss @mention** - Just a cute kiss\n" +
+                                "**k!slap @mention** - Slap slap, how dare you!\n" +
+                                "**k!tickle @mention** - Tickle someone, and they can tickle you too\n" +
+                                "**k!lick @mention** - Lick them all!\n" +
+                                "**k!fluff @mention** - What a fluffy tail!\n" +
+                                "**k!bite @mention** - When lick is not enough!\n" +
+                                "**k!bonk @mention** - Bonk them all!\n" +
+                                "**k!senko** - When you need your dose of Senko!\n",
+                        },
+                        {
+                            name: "Mod commands",
+                            value:
+                                "**k!ban @mention `reason`** - Ban someone, rules are important!\n" +
+                                "**k!kick @mention `reason`** - Kick someone, if you think he needs to get out!\n" +
+                                "**k!mute @mention `time` `reason`** - Don't let spammers do spam!\n*time in hours, should be less than 48. Alias: k!tempmute\n" +
+                                "**k!unmute @mention** - If you need to let someone talk again!\n" +
+                                "**k!checkuser @mention** - If you need to find out important information about the user!\n",
+                        },
+                        {
+                            name: "Logs commands",
+                            value:
+                                "**k!enablelogs** - Enable message actions logging!\n" +
+                                "**k!disablelogs** - Disable message actions logging!\n" +
+                                "**k!changelogs** - Change channel for message actions logs!\n\n" +
+                                "**k!enableleave** - Enable server leave logging!\n" +
+                                "**k!disableleave** - Disable server leave logging!\n" +
+                                "**k!changeleave** - Change channel for server leave logs!\n\n" +
+                                "**k!enablejoin** - Enable server join logging!\n" +
+                                "**k!disablejoin** - Disable server join logging!\n" +
+                                "**k!changejoin** - Change channel for server join logs!\n",
+                        },
+                        {
+                            name: "Other Commands",
+                            value:
+                                "**k!welcome help** - Guide for setting up welcome message\n" +
+                                "**k!help** - Show help\n",
+                        }
+                    )
+                    .setFooter(`KitsuneTheBot v0.0.1`)
+                    .setColor("#ff9d5a");
+                msg.channel.send(embed);
+                break;
+            }
 
-    if (msg.content.toLowerCase().startsWith('k!pat')) {
-        image.commands['pat'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!kiss')) {
-        image.commands['kiss'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!slap')) {
-        image.commands['slap'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!hug')) {
-        image.commands['hug'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!tickle')) {
-        image.commands['tickle'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!lick')) {
-        image.commands['lick'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!bite')) {
-        image.commands['bite'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!fluff')) {
-        image.commands['fluff'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!ban')) {
-        moderation.commands['ban'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!kick')) {
-        moderation.commands['kick'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!tempmute') || msg.content.toLowerCase().startsWith('k!mute')) {
-        moderation.commands['tempmute'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!unmute')) {
-        moderation.commands['unmute'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!enablelogs')) {
-        logs.commands['enablelogs'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!disablelogs')) {
-        logs.commands['disablelogs'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!changelogs')) {
-        logs.commands['changelogs'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!enableleave')) {
-        logs.commands['enableleave'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!disableleave')) {
-        logs.commands['disableleave'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!changeleave')) {
-        logs.commands['changeleave'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!enablejoin')) {
-        logs.commands['enablejoin'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!disablejoin')) {
-        logs.commands['disablejoin'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!changejoin')) {
-        logs.commands['changejoin'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!checkuser')) {
-        moderation.commands['checkuser'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!senko')) {
-        image.commands['senko'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!bonk')) {
-        image.commands['bonk'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!waifu')) {
-        image.commands['waifu'](msg)
-    }
-
-    if (msg.content.toLowerCase().startsWith('k!welcome')) {
-        let perms = msg.channel.permissionsFor(msg.member);
-        if (perms.has('ADMINISTRATOR')) {
-            let options = ['enable', 'changechannel', 'disable', 'setimage', 'settext', 'help']
-            message = msg.content;
-            test = message.replace('k!welcome ', '').split(' ');
-            setting = test.shift()
-            message = test.join(' ').replace(setting, '');
-            if (options.includes(setting)) {
-                welcome.options[setting](msg)
-            } else {
-                // msg.reply('Укажите команду для которой надо настроить права, список команд и их триггеры можете получить используя команду !triggers') TODO
+            default: {
+                msg.channel.send("Hey! I don't have this command! If you want to check all commands, use `k!help`")
+                break
             }
         }
     }
