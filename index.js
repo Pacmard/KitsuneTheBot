@@ -7,8 +7,9 @@ var image = require('./commands/image.js')
 var moderation = require('./commands/moderation.js')
 var logs = require('./commands/logs.js')
 var welcome = require('./commands/welcome.js')
-const { prefix, token, mysql_user, mysql_passwd, mysql_db } = require('./config.json');
-
+const { prefix, token, mysql_user, mysql_passwd, mysql_db, topgg_token } = require('./config.json');
+const Topgg = require('@top-gg/sdk')
+const api = new Topgg.Api(topgg_token)
 
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -16,6 +17,7 @@ var connection = mysql.createConnection({
     password: mysql_passwd,
     database: mysql_db
 })
+
 connection.connect(function (err) {
     if (err) {
         console.error('error connecting: ' + err.stack);
@@ -23,7 +25,6 @@ connection.connect(function (err) {
     }
     console.log('connected as id ' + connection.threadId);
 });
-
 
 client.on('ready', async () => {
     client.user.setActivity('Use k!help to see all commands!');
@@ -58,10 +59,15 @@ client.on('ready', async () => {
             }
         }
     })
+
+    api.postStats({
+        serverCount: client.guilds.cache.size
+    })
+    console.log('Posted latest stat on top.gg')
 });
 
 client.on('message', async msg => {
-    if (msg.content.toLowerCase().startsWith('k!')) {
+    if (msg.content.toLowerCase().startsWith(prefix)) {
         switch (true) {
             case msg.content.toLowerCase().startsWith('k!cuddle'): {
                 image.commands['cuddle'](msg)
@@ -505,3 +511,10 @@ function updateRoles(newMember) {
         }
     })
 }
+
+setInterval(() => {
+    api.postStats({
+        serverCount: client.guilds.cache.size
+    })
+    console.log('Posted latest stat on top.gg')
+}, 1800000)
