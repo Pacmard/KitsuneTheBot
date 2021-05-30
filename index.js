@@ -3,11 +3,12 @@ const client = new Discord.Client({ partials: ['GUILD_MEMBER'] });
 const axios = require('axios')
 const moment = require('moment')
 var mysql = require('mysql');
+const redis = require("redis");
 var image = require('./commands/image.js')
 var moderation = require('./commands/moderation.js')
 var logs = require('./commands/logs.js')
 var welcome = require('./commands/welcome.js')
-const { prefix, token, mysql_user, mysql_passwd, mysql_db, topgg_token } = require('./config.json');
+const { prefix, token, mysql_user, mysql_passwd, mysql_db, topgg_token, redis_url } = require('./config.json');
 const Topgg = require('@top-gg/sdk')
 const api = new Topgg.Api(topgg_token)
 
@@ -24,6 +25,12 @@ connection.connect(function (err) {
         return;
     }
     console.log('connected as id ' + connection.threadId);
+});
+
+const redisClient = redis.createClient(redis_url);
+
+redisClient.on("error", function (error) {
+    console.error(error);
 });
 
 client.on('ready', async () => {
@@ -59,7 +66,8 @@ client.on('ready', async () => {
             }
         }
     })
-
+    redisClient.set("serversAmount", client.guilds.cache.size, redis.print);
+    redisClient.get("serversAmount", redis.print);
     api.postStats({
         serverCount: client.guilds.cache.size
     })
@@ -517,4 +525,6 @@ setInterval(() => {
         serverCount: client.guilds.cache.size
     })
     console.log('Posted latest stat on top.gg')
+
+    redisClient.set("serversAmount", client.guilds.cache.size, redis.print);
 }, 1800000)

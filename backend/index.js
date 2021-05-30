@@ -1,14 +1,22 @@
 const express = require('express')
 const app = express()
+const redis = require('redis')
 const senkoFolder = './senko';
 const bonkFolder = './bonk';
 const waifuFolder = './waifu';
 const waifuSources = require('./sources/waifu.json')
 const senkoSources = require('./sources/senko.json')
+const { redis_url } = require('../config.json');
 const fs = require('fs');
 let senkoFileList = [];
 let bonkFileList = [];
 let waifuFileList = [];
+
+const redisClient = redis.createClient(redis_url);
+
+redisClient.on("error", function (error) {
+  console.error(error);
+});
 
 app.get('/senko', async function (req, res) {
   let picNumber = Math.floor(Math.random() * 97)
@@ -23,6 +31,15 @@ app.get('/bonk', async function (req, res) {
 app.get('/waifu', async function (req, res) {
   let picNumber = Math.floor(Math.random() * 112)
   res.json({ path: `./backend/waifu/${waifuFileList[picNumber]}`, image: `${waifuFileList[picNumber]}`, source: `${waifuSources[waifuFileList[picNumber]]}` })
+});
+
+app.get('/serversCount', async function (req, res) {
+  redisClient.get("serversAmount", function (err, value) {
+    let serverCount = value
+    res.header("Access-Control-Allow-Origin", "*");
+    res.json({ serversCount: serverCount })
+  })
+
 });
 
 app.get('/lick', async function (req, res) {

@@ -18,7 +18,8 @@
     "sync-request": "^6.0.0",
     "xml2json": "^0.11.2",
     "yarn": "^1.22.10",
-    "@topgg/sdk": "^3.1.1"
+    "@top-gg/sdk": "^3.1.1",
+    "redis": "^3.1.2"
   },
   "engines": {
     "node": "14.x"
