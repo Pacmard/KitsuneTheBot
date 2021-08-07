@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "rootDir": "./",
+        "baseUrl": "./",
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "outDir": "./dist",
+        "typeRoots": ["./node_modules/@types", "./types"],
+        "resolveJsonModule": true
+    },
+    "include": [
+        "./*"
+      ]
+}
