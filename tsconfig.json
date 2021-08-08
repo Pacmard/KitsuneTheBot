@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "outDir": "./dist",
         "rootDir": "./",
         "baseUrl": "./",
         "module": "commonjs",
@@ -9,11 +10,12 @@
         "sourceMap": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "outDir": "./dist",
         "typeRoots": ["./node_modules/@types", "./types"],
         "resolveJsonModule": true
     },
     "include": [
-        "./*"
+        "./*",
+        "./database/*",
+        "./commands/*"
       ]
 }

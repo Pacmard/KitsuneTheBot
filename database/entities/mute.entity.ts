@@ -16,7 +16,7 @@ export class MuteEntity {
 
   @Property()
   @Expose({ groups: ['list'] })
-  roles: string;
+  roles: any;
 
   @Property()
   @Expose({ groups: ['list'] })

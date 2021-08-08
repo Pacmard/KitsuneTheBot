@@ -22,6 +22,7 @@ const moment = require('moment');
 const redis = require('redis');
 const Topgg = require('@top-gg/sdk');
 
+// eslint-disable-next-line no-unused-vars
 const api = new Topgg.Api(topggToken);
 
 const redisClient = redis.createClient(redisUrl);
@@ -59,7 +60,7 @@ client.on('ready', async () => {
       if (!guildCheck) return;
       const mutedUser = await guildCheck.members.fetch(userTimed.userid);
       const role = guildCheck.roles.cache.find((r: Role) => r.name === 'Muted_Kitsune');
-      const rolesOld = JSON.parse(userTimed.roles);
+      const rolesOld = userTimed.roles;
       setTimeout(async () => {
         const isMutedNow = await em.findOne({
           userid: userTimed.userid,
@@ -80,22 +81,38 @@ client.on('ready', async () => {
     });
   }
 
-  /*
-    redisClient.set("serversAmount", client.guilds.cache.size, redis.print);
-    api.postStats({
-        serverCount: client.guilds.cache.size
-    })
-    console.log('Posted latest stat on top.gg')
-    */
+  redisClient.set('serversAmount', client.guilds.cache.size, redis.print);
+  api.postStats({
+    serverCount: client.guilds.cache.size,
+  });
+  console.log('Posted latest stat on top.gg');
 });
 
 client.on('messageCreate', (msg: Message) => {
-  if (!msg.content.startsWith(prefix) || msg.author.bot) return;
+  if (!msg.content.toLowerCase().startsWith(prefix) || msg.author.bot) return;
 
   const args = msg.content.slice(prefix.length).trim().split(/ +/);
   const command = args.shift().toLowerCase();
 
-  if (!client.commands.has(command)) return;
+  if (!client.commands.has(command)) {
+    if (command === 'checksame' && msg.author.id === '299176718713880577') {
+      if (msg.author.id === '299176718713880577') {
+        const test = client.guilds.cache.map((guild: any) => {
+          const partition = guild.members.cache.partition((member: any) => member.user.bot);
+          return `${guild.name} (${guild.id}): ${guild.memberCount} (bots: ${partition[0].size} | members: ${partition[1].size})`;
+        }).join('\n');
+        msg.channel.send({
+          files: [{
+            name: 'botcount.txt',
+            attachment: Buffer.from(test),
+          }],
+        });
+      }
+    } else {
+      msg.reply("Hey! I don't have this command! If you want to check all commands, use `k!help`");
+    }
+    return;
+  }
 
   try {
     client.commands.get(command).execute(msg, args);
@@ -135,8 +152,9 @@ client.on('guildCreate', async (guild: Guild) => {
 
     if (!isAlreadyHere) {
       const joinedUnix = member.joinedTimestamp / 1000 | 0;
-      console.log(member.roles);
-      const userRoles = JSON.stringify(member.roles);
+      // @ts-ignore
+      // eslint-disable-next-line no-underscore-dangle
+      const userRoles = member._roles;
       const newUserQuery = new UserInfoEntity();
       newUserQuery.userid = member.user.id;
       newUserQuery.serverid = member.guild.id;
@@ -200,30 +218,31 @@ client.on('messageUpdate', async (oldMessage: Message, newMessage: Message) => {
 });
 
 client.on('guildMemberRemove', async (member: GuildMember) => {
-  const em = (await orm).em.fork().getRepository(LeaveLogEntity);
-  const areLogsEnabled = await em.findOne({
-    serverid: member.guild.id,
-  });
-
-  if (areLogsEnabled) {
-    const userEm = (await orm).em.fork().getRepository(UserInfoEntity);
-    const userInfo = await userEm.findOne({
-      userid: member.user.id,
+  if (member.user.id !== '873507002326847570') {
+    const em = (await orm).em.fork().getRepository(LeaveLogEntity);
+    const areLogsEnabled = await em.findOne({
       serverid: member.guild.id,
     });
 
-    const channel = client.channels.cache.get(areLogsEnabled.logschannel);
-    const datejoined = userInfo.joinTimestamp;
-    const dateNow = new Date();
-    const wasOnServer = moment.unix(datejoined).fromNow();
-    const userRolesLeft = JSON.parse(userInfo.roles);
-    const desc = `${member.user} Joined: ${wasOnServer}\nRoles: ${userRolesLeft.map((item: any) => `<@&${item}>`).join(', ')}`;
-    const subtitle = `${member.user.username}#${member.user.discriminator} left the server.`;
-    const avatar = member.user.avatarURL();
-    const time = `${(dateNow.getHours()).toString().padStart(2, '0')}:${(dateNow.getMinutes()).toString().padStart(2, '0')}:${(dateNow.getSeconds()).toString().padStart(2, '0')}`;
-    const footer = `User ID:${member.user.id} • Today at: ${time}`;
-    const embedCreation = await leaveEmbedGenerator(subtitle, footer, avatar, desc);
-    channel.send({ embeds: [embedCreation] });
+    if (areLogsEnabled) {
+      const userEm = (await orm).em.fork().getRepository(UserInfoEntity);
+      const userInfo = await userEm.findOne({
+        userid: member.user.id,
+        serverid: member.guild.id,
+      });
+
+      const channel = client.channels.cache.get(areLogsEnabled.logschannel);
+      const datejoined = userInfo.joinTimestamp;
+      const dateNow = new Date();
+      const wasOnServer = moment.unix(datejoined).fromNow();
+      const desc = `<@${member.user.id}> Joined: ${wasOnServer}\nRoles: ${userInfo.roles.map((item: any) => `<@&${item}>`).join(', ')}`;
+      const subtitle = `${member.user.username}#${member.user.discriminator} left the server.`;
+      const avatar = member.user.avatarURL();
+      const time = `${(dateNow.getHours()).toString().padStart(2, '0')}:${(dateNow.getMinutes()).toString().padStart(2, '0')}:${(dateNow.getSeconds()).toString().padStart(2, '0')}`;
+      const footer = `User ID:${member.user.id} • Today at: ${time}`;
+      const embedCreation = await leaveEmbedGenerator(subtitle, footer, avatar, desc);
+      channel.send({ embeds: [embedCreation] });
+    }
   }
 });
 
@@ -236,19 +255,19 @@ client.on('guildMemberAdd', async (member: GuildMember) => {
 
   if (!isUserExists) {
     const joinedUnix = member.joinedTimestamp / 1000 | 0;
-    const userRoles = JSON.stringify(member.roles);
     const newUserQuery = new UserInfoEntity();
     newUserQuery.userid = member.user.id;
     newUserQuery.serverid = member.guild.id;
     newUserQuery.joinTimestamp = joinedUnix;
-    newUserQuery.roles = userRoles;
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
+    newUserQuery.roles = member._roles;
     await usersEm.persistAndFlush(newUserQuery);
   } else {
     const dateNow = Date.now() / 1000 | 0;
     isUserExists.joinTimestamp = dateNow;
     await usersEm.persistAndFlush(isUserExists);
-    const giveRolesBack = JSON.parse(isUserExists.roles);
-    member.roles.add(giveRolesBack).catch(console.error);
+    member.roles.add(isUserExists.roles).catch(console.error);
   }
 
   const logsEm = (await orm).em.fork().getRepository(JoinLogEntity);
@@ -280,7 +299,7 @@ client.on('guildMemberAdd', async (member: GuildMember) => {
     const image = `${isWelcomingEnabled.image}`;
     const embedCreation = await welcomeEmbedGenerator(title, image, desc);
     channel.send({
-      content: `${member.user} has joined the server!`,
+      content: `<@${member.user.id}> has joined the server!`,
       embeds: [embedCreation],
     });
   }
@@ -346,23 +365,23 @@ async function updateRoles(newMember: GuildMember) {
   });
 
   if (isUserExists) {
-    const newRoles = JSON.stringify(newMember.roles);
-    isUserExists.roles = newRoles;
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
+    isUserExists.roles = newMember._roles;
     usersEm.persistAndFlush(isUserExists);
   }
 }
-/*
-setInterval(() => {
-    api.postStats({
-        serverCount: client.guilds.cache.size
-    })
-
-    redisClient.set("serversAmount", client.guilds.cache.size);
-}, 10000)
 
 setInterval(() => {
-    api.postStats({
-        serverCount: client.guilds.cache.size
-    })
-}, 30000)
-*/
+  api.postStats({
+    serverCount: client.guilds.cache.size,
+  });
+
+  redisClient.set('serversAmount', client.guilds.cache.size);
+}, 10000);
+
+setInterval(() => {
+  api.postStats({
+    serverCount: client.guilds.cache.size,
+  });
+}, 30000);

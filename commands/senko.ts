@@ -12,13 +12,12 @@ module.exports = {
       url: 'http://localhost:3000/senko',
     });
 
-    const attachment = new Discord.MessageAttachment(`${response.data.path}`, `${response.data.image}`);
     const image = `attachment://${response.data.image}`;
     const title = 'Here, have some cute fox!';
     const subtitle = `${msg.author.username} asks for Senko image!`;
     const footer = `Art source: ${response.data.source}\nKitsuneTheBot v0.0.1`;
-    const embedCreation = await senkoGenerator(title, image, subtitle, attachment, footer);
-    return msg.channel.send({ embeds: [embedCreation] });
+    const embedCreation = await senkoGenerator(title, image, subtitle, footer);
+    return msg.channel.send({ embeds: [embedCreation], files: [`${response.data.path}`] });
   },
 };
 
@@ -26,7 +25,6 @@ function senkoGenerator(
   title: string,
   image: any,
   subtitle: string,
-  attachment: any,
   footer: string,
 ) {
   const embed = new Discord.MessageEmbed()
@@ -34,7 +32,6 @@ function senkoGenerator(
     .setTitle(title)
     .setImage(image)
     .setFooter(footer)
-    .attachFiles(attachment)
     .setAuthor(subtitle);
   return embed;
 }
