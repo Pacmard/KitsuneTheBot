@@ -24,5 +24,5 @@ export class UserInfoEntity {
 
   @Property()
   @Expose({ groups: ['list'] })
-  roles: string;
+  roles: any;
 }

@@ -4,7 +4,8 @@
   "description": "KitsuneTheBot, public bot, made by KitsuneVPN team",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "pm2 start --name kthb ts-node -- index.ts",
+    "restart": "pm2 restart kthb",
     "build": "tsc --build",
     "clean": "tsc --build --clean"
   },

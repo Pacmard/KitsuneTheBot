@@ -1,4 +1,4 @@
-import { Options } from '@mikro-orm/core';
+import { EntityCaseNamingStrategy, Options } from '@mikro-orm/core';
 import {
   JoinLogEntity, MuteEntity, UserInfoEntity, MsgLogsEntity, LeaveLogEntity, WelcomeMsgEntity,
 } from './entities';
@@ -15,4 +15,5 @@ export const ormConfig: Options = {
   host: 'localhost',
   port: 3306,
   password: cfg.mysqlPasswd,
+  namingStrategy: EntityCaseNamingStrategy,
 };

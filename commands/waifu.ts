@@ -17,7 +17,7 @@ module.exports = {
     const subtitle = `${msg.author.username} asks for some good art!`;
     const footer = `Art source: ${response.data.source}\nKitsuneTheBot v0.0.1`;
     const embedCreation = await waifuGenerator(title, image, subtitle, footer);
-    return msg.channel.send({ embeds: [embedCreation], files: [`.${response.data.path}`] });
+    return msg.channel.send({ embeds: [embedCreation], files: [`${response.data.path}`] });
   },
 };
 

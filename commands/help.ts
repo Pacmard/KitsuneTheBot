@@ -30,7 +30,7 @@ module.exports = {
           value:
                 '**k!ban @mention `reason`** - Ban someone, rules are important!\n'
                 + '**k!kick @mention `reason`** - Kick someone, if you think he needs to get out!\n'
-                + "**k!mute @mention `time` `reason`** - Don't let spammers do spam!\n*time in hours, should be less than 48. Alias: k!tempmute\n"
+                + "**k!mute @mention `time` `reason`** - Don't let spammers do spam!\n*time in hours, should be less than 48.\n"
                 + '**k!unmute @mention** - If you need to let someone talk again!\n'
                 + '**k!checkuser @mention** - If you need to find out important information about the user!\n',
         },

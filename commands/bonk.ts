@@ -22,22 +22,20 @@ module.exports = {
       url: 'http://localhost:3000/bonk',
     });
 
-    const attachment = new Discord.MessageAttachment(`${response.data.path}`, `${response.data.image}`);
     const image = `attachment://${response.data.image}`;
     const title = `Hey! ${mention.username}! You'll get bonked!`;
     const subtitle = `${msg.author.username} bonks ${mention.username}!`;
-    const embedCreation = await bonkGenerator(title, image, subtitle, attachment);
-    return msg.channel.send({ embeds: [embedCreation] });
+    const embedCreation = await bonkGenerator(title, image, subtitle);
+    return msg.channel.send({ embeds: [embedCreation], files: [`${response.data.path}`] });
   },
 };
 
-function bonkGenerator(title: string, image: any, subtitle: string, attachment: any) {
+function bonkGenerator(title: string, image: string, subtitle: string) {
   const embed = new Discord.MessageEmbed()
     .setColor('#ff9d5a')
     .setTitle(title)
     .setImage(image)
     .setFooter('KitsuneTheBot v0.0.1')
-    .attachFiles(attachment)
     .setAuthor(subtitle);
   return embed;
 }
