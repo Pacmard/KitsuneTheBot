@@ -7,4 +7,4 @@ export interface CommandInterface {
     guildOnly?: boolean,
     permissions: string,
     args?: boolean,
-};
+}
