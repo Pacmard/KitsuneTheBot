@@ -1,26 +1,39 @@
 /* eslint-disable import/no-dynamic-require */
 import { MikroORM } from '@mikro-orm/core';
+import { PhotoAttachment, VK } from 'vk-io';
 import {
-  Guild, GuildMember, Message, Role, TextChannel,
+  Guild, GuildMember, Interaction, Message, Role, TextChannel,
 } from 'discord.js';
 import { Collection } from '@discordjs/collection';
+import axios from 'axios';
 import {
-  JoinLogEntity, MuteEntity, UserInfoEntity, MsgLogsEntity, LeaveLogEntity, WelcomeMsgEntity,
+  JoinLogEntity,
+  MuteEntity,
+  UserInfoEntity,
+  MsgLogsEntity,
+  LeaveLogEntity,
+  WelcomeMsgEntity,
+  HourlyArtsEntity,
+  ButtonRolesEntity,
 } from './database/entities';
 import { ormConfig } from './database/mikro-orm.config';
 import {
-  prefix, token, topggToken, redisUrl,
+  prefix, token, topggToken, redisUrl, vkToken, uptimeLink,
 } from './config.json';
 
 const orm = MikroORM.init(ormConfig);
 const fs = require('fs');
 const Discord = require('discord.js');
-const { Intents } = require('discord.js');
+const { Intents, WebhookClient } = require('discord.js');
 
 const client = new Discord.Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS], partials: ['GUILD_MEMBER'], fetchAllMembers: true });
 const moment = require('moment');
 const redis = require('redis');
 const Topgg = require('@top-gg/sdk');
+
+const vk = new VK({
+  token: vkToken,
+});
 
 // eslint-disable-next-line no-unused-vars
 const api = new Topgg.Api(topggToken);
@@ -88,7 +101,7 @@ client.on('ready', async () => {
   console.log('Posted latest stat on top.gg');
 });
 
-client.on('messageCreate', (msg: Message) => {
+client.on('messageCreate', async (msg: Message) => {
   if (!msg.content.toLowerCase().startsWith(prefix) || msg.author.bot) return;
 
   const args = msg.content.slice(prefix.length).trim().split(/ +/);
@@ -122,6 +135,28 @@ client.on('messageCreate', (msg: Message) => {
   }
 });
 
+client.on('interactionCreate', async (interaction: Interaction) => {
+  if (!interaction.isButton()) return;
+
+  const em = (await orm).em.fork().getRepository(ButtonRolesEntity);
+
+  const isButtonExists = await em.findOne({
+    serverid: interaction.guild.id,
+    role_uuid: interaction.customId,
+  });
+
+  if (isButtonExists) {
+    const user = await interaction.guild.members.fetch(interaction.user.id);
+    if (!user.roles.cache.has(isButtonExists.role)) {
+      await user.roles.add(isButtonExists.role).catch(console.error);
+      await interaction.reply({ content: 'Role added successfully!', ephemeral: true });
+    } else {
+      await user.roles.remove(isButtonExists.role).catch(console.error);
+      await interaction.reply({ content: 'Role removed successfully!', ephemeral: true });
+    }
+  }
+});
+
 client.on('guildCreate', async (guild: Guild) => {
   let role: Role;
   await guild.roles.create({
@@ -152,14 +187,12 @@ client.on('guildCreate', async (guild: Guild) => {
 
     if (!isAlreadyHere) {
       const joinedUnix = member.joinedTimestamp / 1000 | 0;
-      // @ts-ignore
-      // eslint-disable-next-line no-underscore-dangle
-      const userRoles = member._roles;
       const newUserQuery = new UserInfoEntity();
       newUserQuery.userid = member.user.id;
       newUserQuery.serverid = member.guild.id;
       newUserQuery.joinTimestamp = joinedUnix;
-      newUserQuery.roles = userRoles;
+      const userRoles = [...member.roles.cache.keys()];
+      newUserQuery.roles = JSON.stringify(userRoles);
       em.persist(newUserQuery);
     } else {
       updateRoles(member);
@@ -321,6 +354,29 @@ client.on('guildMemberUpdate', (oldMember: GuildMember, newMember: GuildMember) 
 
 client.login(token);
 
+vk.updates.on('wall_post_new', async (context) => {
+  const em = (await orm).em.fork().getRepository(HourlyArtsEntity);
+  const webhooks = await em.findAll();
+  webhooks.forEach(async (webhook) => {
+    const webhookClient = new WebhookClient({ url: webhook.webhook_url });
+    // @ts-ignore
+    const footer = `Art source: ${context.wall.payload.copyright.link}\nKitsuneTheBot v1.0.0`;
+    const embed = wallEmbedGenerator('New hourly art for you!', (context.wall.attachments[0] as PhotoAttachment).largeSizeUrl, footer);
+    webhookClient.send({ embeds: [embed] });
+  });
+});
+
+vk.updates.start();
+
+function wallEmbedGenerator(title: string, image: string, footer: string) {
+  const embed = new Discord.MessageEmbed()
+    .setColor('#ff9d5a')
+    .setTitle(title)
+    .setImage(image)
+    .setFooter(footer);
+  return embed;
+}
+
 function deletionGenerator(descriprion: string, subtitle: string, footer: string, avatar: string) {
   const embed = new Discord.MessageEmbed()
     .setColor('#ff9d5a')
@@ -373,10 +429,6 @@ async function updateRoles(newMember: GuildMember) {
 }
 
 setInterval(() => {
-  api.postStats({
-    serverCount: client.guilds.cache.size,
-  });
-
   redisClient.set('serversAmount', client.guilds.cache.size);
 }, 10000);
 
@@ -384,4 +436,5 @@ setInterval(() => {
   api.postStats({
     serverCount: client.guilds.cache.size,
   });
+  axios.get(uptimeLink);
 }, 30000);

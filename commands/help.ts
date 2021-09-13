@@ -51,6 +51,8 @@ module.exports = {
           name: 'Other Commands',
           value:
                 '**k!welcome help** - Guide for setting up welcome message\n'
+                + '**k!buttonroles help** -  Guide for setting up button roles\n'
+                + '**k!hourlyarts** - Learn more about our hourly arts\n'
                 + '**k!help** - Show help\n'
                 + '**k!add** - If you want to add this bot to your server\n',
         },

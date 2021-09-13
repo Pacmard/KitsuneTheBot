@@ -15,9 +15,9 @@ module.exports = {
     const image = `attachment://${response.data.image}`;
     const title = 'Here, have a pic of cute anime girl!';
     const subtitle = `${msg.author.username} asks for some good art!`;
-    const footer = `Art source: ${response.data.source}\nKitsuneTheBot v0.0.1`;
+    const footer = `Art source: ${response.data.source}\nKitsuneTheBot v1.0.0`;
     const embedCreation = await waifuGenerator(title, image, subtitle, footer);
-    return msg.channel.send({ embeds: [embedCreation], files: [`${response.data.path}`] });
+    return msg.channel.send({ embeds: [embedCreation], files: [`.${response.data.path}`] });
   },
 };
 

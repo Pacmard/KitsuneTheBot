@@ -26,7 +26,7 @@ module.exports = {
     const title = `Hey! ${mention.username}! You'll get bonked!`;
     const subtitle = `${msg.author.username} bonks ${mention.username}!`;
     const embedCreation = await bonkGenerator(title, image, subtitle);
-    return msg.channel.send({ embeds: [embedCreation], files: [`${response.data.path}`] });
+    return msg.channel.send({ embeds: [embedCreation], files: [`.${response.data.path}`] });
   },
 };
 
@@ -35,7 +35,7 @@ function bonkGenerator(title: string, image: string, subtitle: string) {
     .setColor('#ff9d5a')
     .setTitle(title)
     .setImage(image)
-    .setFooter('KitsuneTheBot v0.0.1')
+    .setFooter('KitsuneTheBot v1.0.0')
     .setAuthor(subtitle);
   return embed;
 }
