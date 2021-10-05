@@ -15,4 +15,4 @@ It can:
 Questions? Contact support@kitsune.su
 
 
-[![Discord Bots](https://top.gg/api/widget/servers/846842703794929685.svg)(https://top.gg/bot/846842703794929685)
+[Discord Bots](https://top.gg/api/widget/servers/846842703794929685.svg)
