@@ -13,3 +13,6 @@ It can:
 - You can see full list of commands after inviting bot to your server and using k!help command
 
 Questions? Contact support@kitsune.su
+
+
+![Discord Bots](https://top.gg/api/widget/servers/846842703794929685.svg)
