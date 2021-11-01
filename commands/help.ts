@@ -23,7 +23,10 @@ module.exports = {
                 + '**k!fluff @mention** - What a fluffy tail!\n'
                 + '**k!bite @mention** - When lick is not enough!\n'
                 + '**k!bonk @mention** - Bonk them all!\n'
-                + '**k!senko** - When you need your dose of Senko!\n',
+                + '**k!kabedon @mention** - This is how you start a love story!\n'
+                + '**k!senko** - When you need your dose of Senko!\n'
+                + '**k!fumo** - fumo-fumo.\n'
+                + '**k!smug** - oh god, it is a smug face!',
         },
         {
           name: 'Mod commands',
@@ -52,12 +55,14 @@ module.exports = {
           value:
                 '**k!welcome help** - Guide for setting up welcome message\n'
                 + '**k!buttonroles help** -  Guide for setting up button roles\n'
-                + '**k!hourlyarts** - Learn more about our hourly arts\n'
+                // + '**k!hourlyarts** - Learn more about our hourly arts\n'
                 + '**k!help** - Show help\n'
-                + '**k!add** - If you want to add this bot to your server\n',
+                + '**k!add** - If you want to add this bot to your server\n'
+                + '**k!vote** - If you want to help this bot be even cooler\n'
+                + '**k!upcoming** - Learn more of features that bot will get soon',
         },
       )
-      .setFooter('KitsuneTheBot v0.0.1')
+      .setFooter('KitsuneTheBot v1.0.0')
       .setColor('#ff9d5a');
     msg.channel.send({ embeds: [embed] });
   },

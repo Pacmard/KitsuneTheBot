@@ -19,7 +19,7 @@ module.exports = {
     }
 
     if (mention.id === msg.author.id) {
-      return msg.reply("You can't mute yourself!");
+      return msg.reply("You can't unmute yourself!");
     }
     const perms = (msg.channel as TextChannel).permissionsFor(msg.member);
     const mutedUser = msg.guild.members.resolve(mention.id);

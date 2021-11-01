@@ -46,6 +46,7 @@ module.exports = {
           const paramsSplit = params.split(' ');
 
           let muteReason: string;
+          const muteTime = parseInt(paramsSplit[0], 10);
 
           if (paramsSplit.length === 1) {
             muteReason = 'Not provided';
@@ -54,7 +55,6 @@ module.exports = {
             muteReason = paramsSplit.join(' ');
           }
 
-          const muteTime = parseInt(paramsSplit[0], 10);
           if (Number.isInteger(muteTime) && muteTime <= 48) {
             const unmute_time = 3600 * muteTime;
             const unmute_timestamp = dateNow + unmute_time;
@@ -84,7 +84,7 @@ module.exports = {
             return msg.channel.send({ embeds: [embedCreation] });
           }
           if (Number.isInteger(muteTime) === false) {
-            return msg.reply('Please indicate the time for mute (in hours!) Exapmle: k!tempmute @KitsuneTheBot 1 Reason');
+            return msg.reply('Please indicate the time for mute (in hours!) Exapmle: k!mute @KitsuneTheBot 1 Reason');
           }
           return msg.channel.send({ content: 'Mute time cannot be more than 48 hours!' });
         }

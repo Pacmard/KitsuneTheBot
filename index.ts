@@ -162,7 +162,7 @@ client.on('guildCreate', async (guild: Guild) => {
   await guild.roles.create({
     name: 'Muted_Kitsune',
     color: 'DEFAULT',
-    reason: 'Role for k!tempmute command',
+    reason: 'Role for k!mute command',
   }).then(async (res) => {
     role = await guild.roles.cache.get(res.id);
     role.setPermissions(BigInt(0));
